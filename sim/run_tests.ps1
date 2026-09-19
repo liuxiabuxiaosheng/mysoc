@@ -26,6 +26,7 @@ $Tests = [ordered]@{
     dma_controller  = "tb/dma/tb_dma_controller.sv"
     apb_dma         = "tb/peripheral/tb_apb_dma.sv"
     soc_dma         = "tb/top/tb_soc_dma.sv"
+    async_fifo      = "tb/cdc/tb_async_fifo.sv"
 }
 
 $Selected = if ($Test -eq "all") { @($Tests.Keys) } else { @($Test) }
