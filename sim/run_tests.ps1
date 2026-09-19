@@ -7,6 +7,9 @@ New-Item -ItemType Directory -Force $BuildDir | Out-Null
 
 $Tests = [ordered]@{
     smoke           = "tb/common/tb_smoke.sv"
+    riscv_units     = "tb/cpu/tb_riscv_units.sv"
+    riscv_core      = "tb/cpu/tb_riscv_core.sv"
+    riscv_faults    = "tb/cpu/tb_riscv_faults.sv"
     onchip_ram      = "tb/memory/tb_onchip_ram.sv"
     cpu_apb_bridge  = "tb/bus/tb_cpu_apb_bridge.sv"
     cpu_bus_decoder = "tb/bus/tb_cpu_bus_decoder.sv"
@@ -19,6 +22,7 @@ $Tests = [ordered]@{
     apb_interconnect = "tb/bus/tb_apb_interconnect.sv"
     apb_subsystem   = "tb/top/tb_apb_subsystem.sv"
     soc_top         = "tb/top/tb_soc_top.sv"
+    soc_cpu         = "tb/top/tb_soc_cpu.sv"
 }
 
 $Selected = if ($Test -eq "all") { @($Tests.Keys) } else { @($Test) }

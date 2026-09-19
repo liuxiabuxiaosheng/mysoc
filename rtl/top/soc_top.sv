@@ -1,4 +1,6 @@
-module soc_top(
+module soc_top #(
+    parameter INTERNAL_CPU = 1'b0
+)(
     input  wire       clk_50m,
     input  wire       rst_n,
     input  wire       uart_rx,
@@ -17,7 +19,9 @@ module soc_top(
     input  wire [3:0]  cpu_req_wstrb,
     output wire [31:0] cpu_resp_rdata,
     output wire        cpu_resp_ready,
-    output wire        cpu_resp_error
+    output wire        cpu_resp_error,
+    output wire        cpu_halted,
+    output wire [3:0]  cpu_fault_code
 );
 
 wire rst_sync;
@@ -51,6 +55,51 @@ wire [3:0]  apb_pstrb;
 wire [31:0] apb_prdata;
 wire        apb_pready;
 wire        apb_pslverr;
+wire [31:0] decoder_resp_rdata;
+wire        decoder_resp_ready;
+wire        decoder_resp_error;
+
+wire        bus_cpu_req_valid;
+wire        bus_cpu_req_write;
+wire [31:0] bus_cpu_req_addr;
+wire [31:0] bus_cpu_req_wdata;
+wire [3:0]  bus_cpu_req_wstrb;
+wire [31:0] core_resp_rdata;
+wire        core_resp_ready;
+wire        core_resp_error;
+wire        core_halted;
+wire [3:0]  core_fault_code;
+
+generate
+    if (INTERNAL_CPU) begin : g_internal_cpu
+        riscv_core u_riscv_core (
+            .clk(clk_sys), .rst_n(rst_sync),
+            .mem_req_valid(bus_cpu_req_valid), .mem_req_write(bus_cpu_req_write),
+            .mem_req_addr(bus_cpu_req_addr), .mem_req_wdata(bus_cpu_req_wdata),
+            .mem_req_wstrb(bus_cpu_req_wstrb),
+            .mem_resp_rdata(decoder_resp_rdata), .mem_resp_ready(decoder_resp_ready),
+            .mem_resp_error(decoder_resp_error), .halted(core_halted),
+            .fault_code(core_fault_code), .dbg_pc()
+        );
+    end else begin : g_external_cpu
+        assign bus_cpu_req_valid = cpu_req_valid;
+        assign bus_cpu_req_write = cpu_req_write;
+        assign bus_cpu_req_addr = cpu_req_addr;
+        assign bus_cpu_req_wdata = cpu_req_wdata;
+        assign bus_cpu_req_wstrb = cpu_req_wstrb;
+        assign core_halted = 1'b0;
+        assign core_fault_code = 4'b0;
+        assign core_resp_rdata = 32'b0;
+        assign core_resp_ready = 1'b0;
+        assign core_resp_error = 1'b0;
+    end
+endgenerate
+
+assign cpu_halted = core_halted;
+assign cpu_fault_code = core_fault_code;
+assign cpu_resp_rdata = decoder_resp_rdata;
+assign cpu_resp_ready = decoder_resp_ready;
+assign cpu_resp_error = decoder_resp_error;
 
 reset_sync u_reset(
     .clk(clk_50m),
@@ -68,14 +117,14 @@ clk_gen u_clk(
 cpu_bus_decoder u_cpu_bus_decoder (
     .clk(clk_sys),
     .rst_n(rst_sync),
-    .cpu_req_valid(cpu_req_valid),
-    .cpu_req_write(cpu_req_write),
-    .cpu_req_addr(cpu_req_addr),
-    .cpu_req_wdata(cpu_req_wdata),
-    .cpu_req_wstrb(cpu_req_wstrb),
-    .cpu_resp_rdata(cpu_resp_rdata),
-    .cpu_resp_ready(cpu_resp_ready),
-    .cpu_resp_error(cpu_resp_error),
+    .cpu_req_valid(bus_cpu_req_valid),
+    .cpu_req_write(bus_cpu_req_write),
+    .cpu_req_addr(bus_cpu_req_addr),
+    .cpu_req_wdata(bus_cpu_req_wdata),
+    .cpu_req_wstrb(bus_cpu_req_wstrb),
+    .cpu_resp_rdata(decoder_resp_rdata),
+    .cpu_resp_ready(decoder_resp_ready),
+    .cpu_resp_error(decoder_resp_error),
     .ram_req_valid(ram_req_valid),
     .ram_req_write(ram_req_write),
     .ram_req_addr(ram_req_addr),
