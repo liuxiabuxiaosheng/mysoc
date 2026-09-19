@@ -47,7 +47,7 @@ Vivado综合与AX7010验证
 当前限制：
 
 - `soc_top`中的APB主设备暂时为空闲连接。
-- 尚无CPU、BRAM、DMA、音频数据链路。
+- 已实现并验证 CPU、64 KiB BRAM、DMA；尚无音频数据链路。
 - 当前顶层时钟为50 MHz直通，尚未使用Clocking Wizard。
 - 尚未执行Vivado综合、时序分析和板级验证。
 
@@ -130,6 +130,8 @@ rtl/cpu/
 - 能执行RISC-V裸机编译器生成的基础程序。
 
 ## 5. 阶段四：软件启动与外设控制
+
+状态：DMA 阶段已完成；软件启动与外设控制仍待实现。
 
 ### 建议目录
 
@@ -315,7 +317,7 @@ CPU检查结果
 | 1 | BRAM与CPU总线 | 建立CPU访问基础 |
 | 2 | 多周期RV32I | 完成项目核心处理器 |
 | 3 | 软件启动 | UART输出第一条CPU程序信息 |
-| 4 | DMA | 建立硬件数据搬运通路 |
+| 4 | DMA | 已完成：建立硬件数据搬运通路 |
 | 5 | Async FIFO | 完成CDC数据传输 |
 | 6 | FIR | 完成硬件音频加速 |
 | 7 | 系统集成 | 完成Audio DSP SoC数据链路 |
@@ -326,4 +328,4 @@ CPU检查结果
 
 下一个具体里程碑：
 
-> 实现64 KiB BRAM、CPU Memory Bus、地址译码和CPU-to-APB Bridge，为自研多周期RV32I接入现有GPIO、Timer和UART外设做好准备。
+> 为已验证的 RV32I CPU 和 DMA 链路加入软件启动目录、链接脚本、启动代码和可加载的 BRAM 固件镜像，完成 CPU 配置 GPIO、UART、Timer 和 DMA 的裸机闭环。

@@ -104,9 +104,9 @@
 | Timer | 已实现并通过回归 | Counter、Compare、单次/周期工作和中断状态。 |
 | UART | 已实现并通过回归 | TX/RX、TX/RX FIFO、APB 寄存器和错误状态；当前顶层未暴露 UART 中断。 |
 | APB/GPIO/Timer/UART Testbench | 已实现并通过完整回归 | 完整回归共 10 个测试，包含单元、互连、子系统和顶层 smoke 测试。 |
-| BRAM / SRAM / ROM | 未实现 | 下一独立子项目首先定义 BRAM 和 CPU 存储接口。 |
-| RISC-V CPU、CPU memory bus、APB bridge | 未实现 | 当前 `soc_top` 的 APB master 保持空闲，尚无 CPU 发起外设访问。 |
-| DMA | 未实现 | 保留为后续独立计划。 |
+| BRAM / SRAM / ROM | 已实现并通过回归 | 已实现 64 KiB on-chip RAM、字节写使能和初始化文件接口。 |
+| RISC-V CPU、CPU memory bus、APB bridge | 已实现并通过回归 | 多周期 RV32I CPU 可通过 CPU bus 访问 BRAM 和 APB 外设。 |
+| DMA | 已实现并通过回归 | 单通道 BRAM-to-BRAM DMA，含 APB 配置、状态机、错误状态和 CPU/DMA RAM 仲裁；详见 `docs/verification/phase4-dma.md`。 |
 | CDC / Async FIFO 集成 | 未实现 | 当前没有多时钟域数据通路。 |
 | FIR | 未实现 | 尚无定点 FIR RTL 或 golden model 验证。 |
 | VGA / TFT / Display | 未实现 | 尚无显示时序、帧缓冲或物理显示输出。 |
