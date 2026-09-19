@@ -29,7 +29,11 @@ wire valid_offset;
 assign pready       = 1'b1;
 assign apb_access   = psel && penable && pready;
 assign apb_write    = apb_access && pwrite;
-assign valid_offset = (paddr[5:2] <= 4'h3);
+assign valid_offset =
+        (paddr[11:0] == 12'h000)
+     || (paddr[11:0] == 12'h004)
+     || (paddr[11:0] == 12'h008)
+     || (paddr[11:0] == 12'h00C);
 assign pslverr      = apb_access && !valid_offset;
 assign timer_irq    = status_reg[0];
 
