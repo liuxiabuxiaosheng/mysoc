@@ -98,6 +98,9 @@ module dma_controller (
                 endcase
             end
 
+            if (start_write && busy)
+                config_error_q <= 1'b1;
+
             case (state)
                 IDLE: begin
                     if (start_write) begin

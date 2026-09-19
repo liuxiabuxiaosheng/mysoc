@@ -29,7 +29,17 @@ module apb_subsystem (
     // UART
 
     input  wire        uart_rx,
-    output wire        uart_tx
+    output wire        uart_tx,
+
+    // DMA memory-master interface
+    output wire        dma_mem_req_valid,
+    output wire        dma_mem_req_write,
+    output wire [31:0] dma_mem_req_addr,
+    output wire [31:0] dma_mem_req_wdata,
+    output wire [3:0]  dma_mem_req_wstrb,
+    input  wire [31:0]  dma_mem_resp_rdata,
+    input  wire         dma_mem_resp_ready,
+    input  wire         dma_mem_resp_error
 
 );
 
@@ -37,6 +47,7 @@ module apb_subsystem (
 wire gpio_psel;
 wire timer_psel;
 wire uart_psel;
+wire dma_psel;
 
 
 // GPIO return
@@ -55,6 +66,10 @@ wire        timer_pslverr;
 wire [31:0] uart_prdata;
 wire        uart_pready;
 wire        uart_pslverr;
+
+wire [31:0] dma_prdata;
+wire        dma_pready;
+wire        dma_pslverr;
 
 
 
@@ -87,7 +102,12 @@ apb_interconnect u_apb_interconnect (
     .uart_psel      (uart_psel),
     .uart_prdata    (uart_prdata),
     .uart_pready    (uart_pready),
-    .uart_pslverr   (uart_pslverr)
+    .uart_pslverr   (uart_pslverr),
+
+    .dma_psel       (dma_psel),
+    .dma_prdata     (dma_prdata),
+    .dma_pready     (dma_pready),
+    .dma_pslverr    (dma_pslverr)
 
 );
 
@@ -168,6 +188,27 @@ uart_top u_uart (
     .rx         (uart_rx),
     .tx         (uart_tx)
 
+);
+
+dma_controller u_dma (
+    .clk            (clk),
+    .rst_n          (rst_n),
+    .paddr          (m_paddr),
+    .psel           (dma_psel),
+    .penable        (m_penable),
+    .pwrite         (m_pwrite),
+    .pwdata         (m_pwdata),
+    .prdata         (dma_prdata),
+    .pready         (dma_pready),
+    .pslverr        (dma_pslverr),
+    .mem_req_valid  (dma_mem_req_valid),
+    .mem_req_write  (dma_mem_req_write),
+    .mem_req_addr   (dma_mem_req_addr),
+    .mem_req_wdata  (dma_mem_req_wdata),
+    .mem_req_wstrb  (dma_mem_req_wstrb),
+    .mem_resp_rdata (dma_mem_resp_rdata),
+    .mem_resp_ready (dma_mem_resp_ready),
+    .mem_resp_error (dma_mem_resp_error)
 );
 
 

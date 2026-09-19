@@ -82,6 +82,17 @@ module tb_dma_controller;
         apb_read(12'h010, status);
         if (status !== 32'h4) $fatal(1, "zero-length error mismatch: %h", status);
 
+        apb_write(12'h008, 32'd1);
+        apb_write(12'h00C, 32'h1);
+        @(posedge clk);
+        apb_write(12'h00C, 32'h1);
+        apb_read(12'h010, status);
+        if (status !== 32'h5) $fatal(1, "busy-start error mismatch: %h", status);
+        mem_resp_rdata <= 32'hDEAD_BEEF; mem_resp_ready <= 1'b1;
+        @(posedge clk); mem_resp_ready <= 1'b0;
+        @(posedge clk); mem_resp_ready <= 1'b1;
+        @(posedge clk); mem_resp_ready <= 1'b0;
+
         $display("PASS tb_dma_controller");
         $finish;
     end

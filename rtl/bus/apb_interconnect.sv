@@ -42,13 +42,23 @@ module apb_interconnect (
 
     input  wire [31:0] uart_prdata,
     input  wire        uart_pready,
-    input  wire        uart_pslverr
+    input  wire        uart_pslverr,
+
+    // =========================
+    // DMA Slave
+    // =========================
+    output wire        dma_psel,
+
+    input  wire [31:0] dma_prdata,
+    input  wire        dma_pready,
+    input  wire        dma_pslverr
 );
 
 
 wire gpio_sel;
 wire timer_sel;
 wire uart_sel;
+wire dma_sel;
 
 
 // GPIO:
@@ -68,10 +78,16 @@ assign timer_sel =
 assign uart_sel =
     (m_paddr[31:12] == 20'h40002);
 
+// DMA:
+// 0x4000_5000 ~ 0x4000_5FFF
+assign dma_sel =
+    (m_paddr[31:12] == 20'h40005);
+
 
 assign gpio_psel  = m_psel && gpio_sel;
 assign timer_psel = m_psel && timer_sel;
 assign uart_psel  = m_psel && uart_sel;
+assign dma_psel   = m_psel && dma_sel;
 
 
 // =========================
@@ -103,6 +119,13 @@ always @(*) begin
         m_prdata  = uart_prdata;
         m_pready  = uart_pready;
         m_pslverr = uart_pslverr;
+
+    end
+    else if (m_psel && dma_sel) begin
+
+        m_prdata  = dma_prdata;
+        m_pready  = dma_pready;
+        m_pslverr = dma_pslverr;
 
     end
     else if (m_psel) begin

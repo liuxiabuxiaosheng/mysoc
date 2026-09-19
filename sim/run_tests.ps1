@@ -24,6 +24,8 @@ $Tests = [ordered]@{
     soc_top         = "tb/top/tb_soc_top.sv"
     soc_cpu         = "tb/top/tb_soc_cpu.sv"
     dma_controller  = "tb/dma/tb_dma_controller.sv"
+    apb_dma         = "tb/peripheral/tb_apb_dma.sv"
+    soc_dma         = "tb/top/tb_soc_dma.sv"
 }
 
 $Selected = if ($Test -eq "all") { @($Tests.Keys) } else { @($Test) }
