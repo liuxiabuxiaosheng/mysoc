@@ -420,7 +420,7 @@ git commit -m "feat: implement verified UART datapath primitives"
 
 - [ ] **Step 1: Write the failing APB UART loopback test**
 
-Instantiate `uart_top` with `tx` connected to `rx`. After reset, verify BAUD defaults to 868, program BAUD to 8 for fast loopback simulation, enable TX and RX, write bytes `8'h55`, `8'hA3`, and `8'h00` to DATA, wait until RX is nonempty, then read the same bytes in order. In a separate fullness case, reset the DUT, set BAUD to 2000, enable TX, perform seventeen DATA writes faster than one frame can drain, and verify the seventeenth full-FIFO write returns `PSLVERR`. Also verify reading DATA while RX-empty returns `PSLVERR` and offset `0x10` returns `PSLVERR`.
+Instantiate `uart_top` with `tx` connected to `rx`. After reset, verify BAUD defaults to 868, program BAUD to 8 for fast loopback simulation, enable TX and RX, write bytes `8'h55`, `8'hA3`, and `8'h00` to DATA, wait until RX is nonempty, then read the same bytes in order. In a separate fullness case, reset the DUT, set BAUD to 2000, enable TX, continue writing while polling `UART_STATUS.TX_FULL`, then verify the first DATA write attempted while TX_FULL is asserted returns `PSLVERR`. Also verify reading DATA while RX-empty returns `PSLVERR` and offset `0x10` returns `PSLVERR`.
 
 - [ ] **Step 2: Run and verify failure**
 
