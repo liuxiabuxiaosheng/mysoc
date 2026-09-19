@@ -23,7 +23,6 @@ foreach ($Name in $Selected) {
     if (-not $Tests.Contains($Name)) { throw "Unknown test: $Name" }
     $TbPath = Join-Path $ProjectRoot $Tests[$Name]
     if (-not (Test-Path $TbPath)) {
-        if ($Test -eq "all") { continue }
         throw "Testbench does not exist: $TbPath"
     }
     $Top = "tb_$Name"

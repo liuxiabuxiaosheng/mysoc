@@ -53,15 +53,48 @@ module tb_apb_gpio;
         if (err || gpio_out !== 8'hA5) $fatal(1, "GPIO_DATA write failed");
         apb_write(32'h4000_0004, 32'h0000_003C, err);
         if (err || gpio_dir !== 8'h3C) $fatal(1, "GPIO_DIR write failed");
+
+        @(negedge pclk);
         gpio_in = 8'h5A;
+        paddr = 32'h4000_0008;
+        psel = 1'b1;
+        penable = 1'b0;
+        pwrite = 1'b0;
+        #1;
+        if (prdata !== 32'h0000_0000)
+            $fatal(1, "GPIO_INPUT changed before the first synchronizer clock");
+        @(posedge pclk); #1;
+        if (prdata !== 32'h0000_0000)
+            $fatal(1, "GPIO_INPUT bypassed the second synchronizer stage");
+        @(posedge pclk); #1;
+        if (prdata !== 32'h0000_005A)
+            $fatal(1, "GPIO_INPUT did not appear after two synchronizer clocks");
+        @(negedge pclk);
+        apb_idle();
+
         apb_read(32'h4000_0008, rdata, err);
         if (err || rdata !== 32'h0000_005A) $fatal(1, "GPIO_INPUT read failed");
         apb_read(32'h4000_000C, rdata, err);
-        if (!err) $fatal(1, "invalid GPIO offset did not assert PSLVERR");
+        if (!err || rdata !== 32'h0000_0000)
+            $fatal(1, "invalid GPIO offset response mismatch");
         apb_read(32'h4000_0100, rdata, err);
-        if (!err) $fatal(1, "GPIO window alias did not assert PSLVERR");
+        if (!err || rdata !== 32'h0000_0000)
+            $fatal(1, "GPIO window alias response mismatch");
         apb_read(32'h4000_0002, rdata, err);
-        if (!err) $fatal(1, "unaligned GPIO access did not assert PSLVERR");
+        if (!err || rdata !== 32'h0000_0000)
+            $fatal(1, "unaligned GPIO access response mismatch");
+
+        @(negedge pclk);
+        paddr = 32'h4000_0008;
+        gpio_in = 8'hA5;
+        repeat (2) @(posedge pclk);
+        #1;
+        if (prdata !== 32'h0000_00A5)
+            $fatal(1, "GPIO_INPUT precondition for reset test failed");
+        #2 presetn = 1'b0;
+        #1;
+        if (prdata !== 32'h0000_0000)
+            $fatal(1, "GPIO input synchronizer did not clear asynchronously");
 
         $display("PASS tb_apb_gpio");
         $finish;

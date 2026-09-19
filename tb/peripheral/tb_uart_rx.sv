@@ -53,6 +53,62 @@ module tb_uart_rx;
         end
     endtask
 
+    task automatic send_two_back_to_back_frames(input logic [7:0] first_value,
+                                                input logic [7:0] second_value);
+        begin
+            drive_bit(1'b0, BAUD_DIV);
+            drive_bit(first_value[0], BAUD_DIV);
+            drive_bit(first_value[1], BAUD_DIV);
+            drive_bit(first_value[2], BAUD_DIV);
+            drive_bit(first_value[3], BAUD_DIV);
+            drive_bit(first_value[4], BAUD_DIV);
+            drive_bit(first_value[5], BAUD_DIV);
+            drive_bit(first_value[6], BAUD_DIV);
+            drive_bit(first_value[7], BAUD_DIV);
+            drive_bit(1'b1, BAUD_DIV);
+            drive_bit(1'b0, BAUD_DIV);
+            drive_bit(second_value[0], BAUD_DIV);
+            drive_bit(second_value[1], BAUD_DIV);
+            drive_bit(second_value[2], BAUD_DIV);
+            drive_bit(second_value[3], BAUD_DIV);
+            drive_bit(second_value[4], BAUD_DIV);
+            drive_bit(second_value[5], BAUD_DIV);
+            drive_bit(second_value[6], BAUD_DIV);
+            drive_bit(second_value[7], BAUD_DIV);
+            drive_bit(1'b1, BAUD_DIV);
+            drive_bit(1'b1, BAUD_DIV * 2);
+        end
+    endtask
+
+    task automatic expect_two_bytes(input logic [7:0] first_expected,
+                                    input logic [7:0] second_expected);
+        int cycles;
+        int seen;
+        begin
+            seen = 0;
+            for (cycles = 0; cycles < BAUD_DIV * 24; cycles = cycles + 1) begin
+                @(posedge clk);
+                #1;
+                if (valid) begin
+                    check(frame_error === 1'b0,
+                          "back-to-back valid frame reported frame_error");
+                    if (seen == 0)
+                        check(data_out === first_expected,
+                              $sformatf("first consecutive byte=%h expected=%h",
+                                        data_out, first_expected));
+                    else if (seen == 1)
+                        check(data_out === second_expected,
+                              $sformatf("second consecutive byte=%h expected=%h",
+                                        data_out, second_expected));
+                    else
+                        check(1'b0, "more than two bytes received");
+                    seen = seen + 1;
+                end
+            end
+            check(seen == 2, "expected two consecutive received bytes");
+        end
+    endtask
+
     task automatic expect_byte(input logic [7:0] expected_data,
                                input logic expected_frame_error);
         int cycles;
@@ -95,7 +151,7 @@ module tb_uart_rx;
         clk = 1'b0;
         rst_n = 1'b0;
         rx = 1'b1;
-        baud_div = BAUD_DIV;
+        baud_div = 32'd7;
 
         repeat (2) @(posedge clk);
         @(negedge clk);
@@ -120,6 +176,12 @@ module tb_uart_rx;
                 drive_bit(1'b1, BAUD_DIV * 13);
             end
             expect_no_byte(BAUD_DIV * 12 + 8);
+        join
+
+        baud_div = BAUD_DIV;
+        fork
+            send_two_back_to_back_frames(8'hA6, 8'h59);
+            expect_two_bytes(8'hA6, 8'h59);
         join
 
         $display("PASS tb_uart_rx");

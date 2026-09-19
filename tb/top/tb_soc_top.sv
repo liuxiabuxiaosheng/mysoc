@@ -46,6 +46,19 @@ module tb_soc_top;
 
         @(negedge clk_50m);
         rst_n = 1'b1;
+        #1;
+        check(phase1_ready === 1'b0,
+              "phase1_ready asserted asynchronously with rst_n release");
+        check(dut.rst_sync === 1'b0,
+              "internal reset did not remain asserted at external release");
+        check(dut.u_apb_subsystem.m_psel === 1'b0,
+              "phase-one top APB master was not tied idle");
+
+        @(posedge clk_50m); #1;
+        check(phase1_ready === 1'b0 && dut.rst_sync === 1'b0,
+              "phase1_ready bypassed synchronized reset release");
+        check(dut.u_apb_subsystem.m_psel === 1'b0,
+              "phase-one top APB master selected a slave after reset release");
 
         cycles = 0;
         while ((phase1_ready !== 1'b1) && (cycles < 20)) begin

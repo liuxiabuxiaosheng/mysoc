@@ -55,7 +55,7 @@ module tb_uart_tx;
         rst_n = 1'b0;
         data_in = 8'h00;
         start = 1'b0;
-        baud_div = BAUD_DIV;
+        baud_div = 32'd7;
 
         repeat (2) @(posedge clk);
         @(negedge clk);
@@ -64,6 +64,8 @@ module tb_uart_tx;
         check(tx === 1'b1, "reset should leave tx idle high");
         check(busy === 1'b0, "reset should leave transmitter idle");
         check(done === 1'b0, "reset should clear done");
+        check(baud_div < BAUD_DIV,
+              "test must exercise the minimum-divider clamp");
 
         @(negedge clk);
         data_in = 8'hA5;

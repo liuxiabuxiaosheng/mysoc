@@ -154,11 +154,15 @@ module tb_uart_top;
             apb_write(UART_BAUD, 32'd0, err);
             check(!err, "UART_BAUD write 0 failed");
             apb_read(UART_BAUD, rdata, err);
-            check(!err && rdata == 32'd2, "UART_BAUD did not clamp 0 to 2");
+            check(!err && rdata == 32'd8, "UART_BAUD did not clamp 0 to 8");
             apb_write(UART_BAUD, 32'd1, err);
             check(!err, "UART_BAUD write 1 failed");
             apb_read(UART_BAUD, rdata, err);
-            check(!err && rdata == 32'd2, "UART_BAUD did not clamp 1 to 2");
+            check(!err && rdata == 32'd8, "UART_BAUD did not clamp 1 to 8");
+            apb_write(UART_BAUD, 32'd7, err);
+            check(!err, "UART_BAUD write 7 failed");
+            apb_read(UART_BAUD, rdata, err);
+            check(!err && rdata == 32'd8, "UART_BAUD did not clamp 7 to 8");
 
             apb_write(UART_BAUD, 32'd8, err);
             check(!err, "UART_BAUD manual RX setup failed");

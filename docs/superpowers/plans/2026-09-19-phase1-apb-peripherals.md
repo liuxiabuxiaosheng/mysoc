@@ -373,7 +373,7 @@ Expected: FAIL because the existing transmitter has a fixed parameter divider, a
 
 - [ ] **Step 7: Implement programmable-divider TX**
 
-Replace the fixed `BAUD_CNT` parameter with `input logic [31:0] baud_div`. Latch `data_in` only when idle and `start` is asserted. Treat divider values below two as two. Hold start, each of eight data bits, and stop for exactly the latched divider count. Keep `busy=1` from acceptance through the final stop-bit clock and pulse `done` for one system clock.
+Replace the fixed `BAUD_CNT` parameter with `input logic [31:0] baud_div`. Latch `data_in` only when idle and `start` is asserted. Treat divider values below eight as eight. Hold start, each of eight data bits, and stop for exactly the latched divider count. Keep `busy=1` from acceptance through the final stop-bit clock and pulse `done` for one system clock.
 
 - [ ] **Step 8: Write and run RX test before RX implementation**
 
@@ -385,7 +385,7 @@ Expected: FAIL because `uart_rx.sv` is empty.
 
 - [ ] **Step 9: Implement mid-bit-sampling RX**
 
-Synchronize `rx` through two flip-flops. Detect a low start candidate, wait half of the latched divider, reject it if the synchronized line returned high, then sample eight LSB-first data bits every divider clocks. Sample the stop bit one divider later, pulse `valid`, and pulse `frame_error` when stop is low. Treat divider values below two as two.
+Synchronize `rx` through two flip-flops. Detect a low start candidate, wait half of the latched divider, reject it if the synchronized line returned high, then sample eight LSB-first data bits every divider clocks. Sample the stop bit one divider later, pulse `valid`, and pulse `frame_error` when stop is low. Treat divider values below eight as eight.
 
 - [ ] **Step 10: Run all three primitive tests**
 
@@ -436,7 +436,7 @@ The register bank must:
 - Push `pwdata[7:0]` to TX FIFO on a valid DATA write when TX is enabled and FIFO is not full.
 - Pop RX FIFO on a valid DATA read when RX is enabled and FIFO is not empty.
 - Return STATUS from the defined FIFO flags and sticky frame-error bit.
-- Update CTRL and BAUD on valid writes, clamping BAUD values below two to two.
+- Update CTRL and BAUD on valid writes, clamping BAUD values below eight to eight.
 - Return `PSLVERR` for invalid offsets, TX writes when disabled/full, and RX reads when disabled/empty.
 - Set frame-error sticky status on an RX frame error and clear it when CTRL bit 8 is written as one.
 

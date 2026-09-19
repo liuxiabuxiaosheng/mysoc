@@ -159,7 +159,7 @@ The expiry flag is sticky until software writes one to clear it. MVP firmware po
 | `0x08` | `UART_CTRL` | RW | TX/RX enable and sticky error clear controls |
 | `0x0C` | `UART_BAUD` | RW | System-clock cycles per serial bit |
 
-The baud divider width is derived from its configured maximum and is not fixed to nine bits. The default simulation setting is computed from the 100 MHz system clock and 115200 baud.
+The baud divider width is derived from its configured maximum and is not fixed to nine bits. The default simulation setting is computed from the 100 MHz system clock and 115200 baud. For safe TX and mid-bit RX timing, register writes and the TX/RX primitives clamp divider values below 8 to 8.
 
 ### 9.4 DMA
 

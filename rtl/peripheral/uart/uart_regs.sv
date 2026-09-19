@@ -102,7 +102,7 @@ always_ff @(posedge pclk or negedge presetn) begin
             ctrl_reg <= {30'd0, pwdata[1:0]};
 
         if (baud_write && !pslverr)
-            baud_reg <= (pwdata < 32'd2) ? 32'd2 : pwdata;
+            baud_reg <= (pwdata < 32'd8) ? 32'd8 : pwdata;
 
         if (ctrl_clear_errors) begin
             frame_error_sticky <= frame_error_set;

@@ -22,7 +22,7 @@ module uart_rx (
     logic [2:0]  bit_index;
     logic [7:0]  data_shift;
 
-    wire [31:0] baud_clamped = (baud_div < 32'd2) ? 32'd2 : baud_div;
+    wire [31:0] baud_clamped = (baud_div < 32'd8) ? 32'd8 : baud_div;
     wire [31:0] half_count = (baud_latched >> 1);
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -30,7 +30,7 @@ module uart_rx (
             state        <= S_IDLE;
             rx_meta      <= 1'b1;
             rx_sync      <= 1'b1;
-            baud_latched <= 32'd2;
+            baud_latched <= 32'd8;
             baud_count   <= 32'd0;
             bit_index    <= 3'd0;
             data_shift   <= 8'd0;

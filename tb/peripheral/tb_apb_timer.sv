@@ -92,11 +92,14 @@ module tb_apb_timer;
             $fatal(1, "periodic second expiry was not observed");
 
         apb_read(32'h4000_1010, rdata, err);
-        if (!err) $fatal(1, "invalid timer offset did not assert PSLVERR");
+        if (!err || rdata !== 32'h0000_0000)
+            $fatal(1, "invalid timer offset response mismatch");
         apb_read(32'h4000_1100, rdata, err);
-        if (!err) $fatal(1, "timer alias offset did not assert PSLVERR");
+        if (!err || rdata !== 32'h0000_0000)
+            $fatal(1, "timer alias offset response mismatch");
         apb_read(32'h4000_1002, rdata, err);
-        if (!err) $fatal(1, "unaligned timer offset did not assert PSLVERR");
+        if (!err || rdata !== 32'h0000_0000)
+            $fatal(1, "unaligned timer offset response mismatch");
 
         $display("PASS tb_apb_timer");
         $finish;

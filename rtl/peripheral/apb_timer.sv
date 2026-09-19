@@ -82,11 +82,11 @@ end
 // =============================
 
 always @(*) begin
-    case (paddr[5:2])
-        4'h0: prdata = ctrl_reg;
-        4'h1: prdata = counter_reg;
-        4'h2: prdata = compare_reg;
-        4'h3: prdata = status_reg;
+    case (paddr[11:0])
+        12'h000: prdata = ctrl_reg;
+        12'h004: prdata = counter_reg;
+        12'h008: prdata = compare_reg;
+        12'h00C: prdata = status_reg;
         default: prdata = 32'd0;
     endcase
 end

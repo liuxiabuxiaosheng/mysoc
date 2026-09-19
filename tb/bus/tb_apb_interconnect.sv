@@ -121,6 +121,30 @@ module tb_apb_interconnect;
               "GPIO access phase selection changed");
         finish_transfer();
 
+        start_transfer(32'h4000_0008, 1'b0, 32'd0);
+        enter_access();
+        @(posedge pclk); #1;
+        check(gpio_psel && m_pready && m_prdata == gpio_prdata && !m_pslverr,
+              "first back-to-back GPIO access did not complete");
+        @(negedge pclk);
+        m_paddr   = 32'h4000_2004;
+        m_penable = 1'b0;
+        #1;
+        check(m_psel && !m_penable && uart_psel && !gpio_psel && !timer_psel,
+              "back-to-back UART setup was not selected without an idle cycle");
+        check(m_prdata == uart_prdata && m_pready == uart_pready &&
+              m_pslverr == uart_pslverr,
+              "back-to-back UART setup response was not propagated");
+        @(negedge pclk);
+        m_penable = 1'b1;
+        @(posedge pclk); #1;
+        check(m_psel && m_penable && uart_psel && !gpio_psel && !timer_psel,
+              "second back-to-back UART access was not selected");
+        check(m_prdata == uart_prdata && m_pready == uart_pready &&
+              m_pslverr == uart_pslverr,
+              "second back-to-back UART response was not propagated");
+        finish_transfer();
+
         start_transfer(32'h4000_1000, 1'b1, 32'hA5A5_5A5A);
         check({uart_psel, timer_psel, gpio_psel} == 3'b010,
               "timer setup phase was not one-hot selected");
