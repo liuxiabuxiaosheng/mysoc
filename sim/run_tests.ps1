@@ -7,6 +7,7 @@ New-Item -ItemType Directory -Force $BuildDir | Out-Null
 
 $Tests = [ordered]@{
     smoke           = "tb/common/tb_smoke.sv"
+    onchip_ram      = "tb/memory/tb_onchip_ram.sv"
     apb_gpio        = "tb/peripheral/tb_apb_gpio.sv"
     apb_timer       = "tb/peripheral/tb_apb_timer.sv"
     uart_fifo       = "tb/peripheral/tb_uart_fifo.sv"
