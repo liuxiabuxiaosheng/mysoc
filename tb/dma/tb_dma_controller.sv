@@ -93,6 +93,25 @@ module tb_dma_controller;
         @(posedge clk); mem_resp_ready <= 1'b1;
         @(posedge clk); mem_resp_ready <= 1'b0;
 
+        apb_write(12'h010, 32'hC);
+        apb_write(12'h000, 32'h0000_0102);
+        apb_write(12'h004, 32'h0000_0200);
+        apb_write(12'h008, 32'd1);
+        apb_write(12'h00C, 32'h1);
+        apb_read(12'h010, status);
+        if ((status & 32'h4) == 0) $fatal(1, "unaligned error mismatch: %h", status);
+
+        apb_write(12'h010, 32'hC);
+        apb_write(12'h000, 32'h0000_0100);
+        apb_write(12'h004, 32'h0000_0200);
+        apb_write(12'h008, 32'd1);
+        apb_write(12'h00C, 32'h1);
+        @(posedge clk);
+        mem_resp_error <= 1'b1;
+        @(posedge clk); mem_resp_error <= 1'b0;
+        apb_read(12'h010, status);
+        if ((status & 32'h8) == 0) $fatal(1, "bus error mismatch: %h", status);
+
         $display("PASS tb_dma_controller");
         $finish;
     end

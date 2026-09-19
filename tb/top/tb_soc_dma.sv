@@ -80,6 +80,20 @@ module tb_soc_dma;
         cpu_read(32'h4000_5010, value);
         if (!value[2]) $fatal(1, "DMA zero-length error missing: %h", value);
 
+        cpu_write(32'h4000_5010, 32'h4);
+        cpu_write(32'h4000_5000, 32'hFFFC);
+        cpu_write(32'h4000_5004, 32'hC0);
+        cpu_write(32'h4000_5008, 32'd2);
+        cpu_write(32'h4000_500c, 32'h1);
+        done_seen = 1'b0;
+        timeout = 0;
+        while ((timeout < 100) && !done_seen) begin
+            cpu_read(32'h4000_5010, value);
+            done_seen = value[3];
+            timeout = timeout + 1;
+        end
+        if (!done_seen) $fatal(1, "DMA bus error missing: %h", value);
+
         $display("PASS tb_soc_dma");
         $finish;
     end
