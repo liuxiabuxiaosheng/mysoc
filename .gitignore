@@ -1,0 +1,5 @@
+.worktrees/
+.superpowers/
+sim/build/
+*.vvp
+*.vcd
