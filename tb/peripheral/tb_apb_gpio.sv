@@ -44,6 +44,7 @@ module tb_apb_gpio;
         apb_idle();
 
         repeat (4) @(posedge pclk);
+        @(negedge pclk);
         presetn = 1'b1;
 
         apb_read(32'h4000_0000, rdata, err);
@@ -57,6 +58,10 @@ module tb_apb_gpio;
         if (err || rdata !== 32'h0000_005A) $fatal(1, "GPIO_INPUT read failed");
         apb_read(32'h4000_000C, rdata, err);
         if (!err) $fatal(1, "invalid GPIO offset did not assert PSLVERR");
+        apb_read(32'h4000_0100, rdata, err);
+        if (!err) $fatal(1, "GPIO window alias did not assert PSLVERR");
+        apb_read(32'h4000_0002, rdata, err);
+        if (!err) $fatal(1, "unaligned GPIO access did not assert PSLVERR");
 
         $display("PASS tb_apb_gpio");
         $finish;

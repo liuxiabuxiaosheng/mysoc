@@ -26,9 +26,9 @@ module apb_gpio #(
 
 // нч wait state
 wire [3:0] reg_offset = paddr[5:2];
-wire valid_offset = (reg_offset == 4'h0) ||
-                    (reg_offset == 4'h1) ||
-                    (reg_offset == 4'h2);
+wire valid_offset = (paddr[11:0] == 12'h000) ||
+                    (paddr[11:0] == 12'h004) ||
+                    (paddr[11:0] == 12'h008);
 
 assign pready  = 1'b1;
 assign pslverr = psel && penable && !valid_offset;
