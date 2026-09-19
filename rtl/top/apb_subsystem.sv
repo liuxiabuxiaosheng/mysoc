@@ -24,13 +24,19 @@ module apb_subsystem (
 
     // Timer
 
-    output wire        timer_irq
+    output wire        timer_irq,
+
+    // UART
+
+    input  wire        uart_rx,
+    output wire        uart_tx
 
 );
 
 
 wire gpio_psel;
 wire timer_psel;
+wire uart_psel;
 
 
 // GPIO return
@@ -43,6 +49,12 @@ wire        gpio_pslverr;
 wire [31:0] timer_prdata;
 wire        timer_pready;
 wire        timer_pslverr;
+
+
+// UART return
+wire [31:0] uart_prdata;
+wire        uart_pready;
+wire        uart_pslverr;
 
 
 
@@ -70,7 +82,12 @@ apb_interconnect u_apb_interconnect (
     .timer_psel     (timer_psel),
     .timer_prdata   (timer_prdata),
     .timer_pready   (timer_pready),
-    .timer_pslverr  (timer_pslverr)
+    .timer_pslverr  (timer_pslverr),
+
+    .uart_psel      (uart_psel),
+    .uart_prdata    (uart_prdata),
+    .uart_pready    (uart_pready),
+    .uart_pslverr   (uart_pslverr)
 
 );
 
@@ -125,6 +142,31 @@ apb_timer u_timer (
     .pslverr    (timer_pslverr),
 
     .timer_irq  (timer_irq)
+
+);
+
+
+// =======================================
+// UART
+// =======================================
+
+uart_top u_uart (
+
+    .pclk       (clk),
+    .presetn    (rst_n),
+
+    .paddr      (m_paddr),
+    .psel       (uart_psel),
+    .penable    (m_penable),
+    .pwrite     (m_pwrite),
+    .pwdata     (m_pwdata),
+
+    .prdata     (uart_prdata),
+    .pready     (uart_pready),
+    .pslverr    (uart_pslverr),
+
+    .rx         (uart_rx),
+    .tx         (uart_tx)
 
 );
 

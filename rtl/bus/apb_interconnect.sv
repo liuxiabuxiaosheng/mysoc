@@ -1,5 +1,5 @@
-/*1. 地址译码
-  2. 返回数据MUX
+/*1. 鍦板潃璇戠爜
+  2. 杩斿洖鏁版嵁MUX
 */
 
 module apb_interconnect (
@@ -33,12 +33,22 @@ module apb_interconnect (
 
     input  wire [31:0] timer_prdata,
     input  wire        timer_pready,
-    input  wire        timer_pslverr
+    input  wire        timer_pslverr,
+
+    // =========================
+    // UART Slave
+    // =========================
+    output wire        uart_psel,
+
+    input  wire [31:0] uart_prdata,
+    input  wire        uart_pready,
+    input  wire        uart_pslverr
 );
 
 
 wire gpio_sel;
 wire timer_sel;
+wire uart_sel;
 
 
 // GPIO:
@@ -53,12 +63,19 @@ assign timer_sel =
     (m_paddr[31:12] == 20'h40001);
 
 
+// UART:
+// 0x4000_2000 ~ 0x4000_2FFF
+assign uart_sel =
+    (m_paddr[31:12] == 20'h40002);
+
+
 assign gpio_psel  = m_psel && gpio_sel;
 assign timer_psel = m_psel && timer_sel;
+assign uart_psel  = m_psel && uart_sel;
 
 
 // =========================
-// 返回数据 MUX
+// 杩斿洖鏁版嵁 MUX
 // =========================
 
 always @(*) begin
@@ -67,23 +84,30 @@ always @(*) begin
     m_pready  = 1'b1;
     m_pslverr = 1'b0;
 
-    if (gpio_sel) begin
+    if (m_psel && gpio_sel) begin
 
         m_prdata  = gpio_prdata;
         m_pready  = gpio_pready;
         m_pslverr = gpio_pslverr;
 
     end
-    else if (timer_sel) begin
+    else if (m_psel && timer_sel) begin
 
         m_prdata  = timer_prdata;
         m_pready  = timer_pready;
         m_pslverr = timer_pslverr;
 
     end
+    else if (m_psel && uart_sel) begin
+
+        m_prdata  = uart_prdata;
+        m_pready  = uart_pready;
+        m_pslverr = uart_pslverr;
+
+    end
     else if (m_psel) begin
 
-        // 地址没有对应任何 Slave
+        // 鍦板潃娌℃湁瀵瑰簲浠讳綍 Slave
         m_prdata  = 32'hDEAD_BEEF;
         m_pready  = 1'b1;
         m_pslverr = 1'b1;
