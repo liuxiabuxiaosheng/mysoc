@@ -40,6 +40,12 @@ module apb_subsystem (
     input  wire [31:0]  dma_mem_resp_rdata,
     input  wire         dma_mem_resp_ready,
     input  wire         dma_mem_resp_error,
+    output wire         dma_fifo_in_valid,
+    output wire signed [15:0] dma_fifo_in_data,
+    input  wire          dma_fifo_in_ready,
+    output wire          dma_fifo_out_ready,
+    input  wire          dma_fifo_out_valid,
+    input  wire signed [15:0] dma_fifo_out_data,
 
     // Audio control/status and FIR configuration
     output wire         audio_enable,
@@ -228,7 +234,13 @@ dma_controller u_dma (
     .mem_req_wstrb  (dma_mem_req_wstrb),
     .mem_resp_rdata (dma_mem_resp_rdata),
     .mem_resp_ready (dma_mem_resp_ready),
-    .mem_resp_error (dma_mem_resp_error)
+    .mem_resp_error (dma_mem_resp_error),
+    .fifo_in_valid  (dma_fifo_in_valid),
+    .fifo_in_data   (dma_fifo_in_data),
+    .fifo_in_ready  (dma_fifo_in_ready),
+    .fifo_out_ready (dma_fifo_out_ready),
+    .fifo_out_valid (dma_fifo_out_valid),
+    .fifo_out_data  (dma_fifo_out_data)
 );
 
 audio_ctrl u_audio_ctrl (
