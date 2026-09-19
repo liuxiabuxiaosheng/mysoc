@@ -12,7 +12,8 @@ task automatic apb_write(input logic [31:0] addr,
         paddr = addr; pwdata = data; pwrite = 1; psel = 1; penable = 0;
         @(negedge pclk);
         penable = 1;
-        while (!pready) @(negedge pclk);
+        @(posedge pclk);
+        while (!pready) @(posedge pclk);
         error_seen = pslverr;
         @(negedge pclk);
         apb_idle();
@@ -27,7 +28,8 @@ task automatic apb_read(input logic [31:0] addr,
         paddr = addr; pwrite = 0; psel = 1; penable = 0;
         @(negedge pclk);
         penable = 1;
-        while (!pready) @(negedge pclk);
+        @(posedge pclk);
+        while (!pready) @(posedge pclk);
         data = prdata; error_seen = pslverr;
         @(negedge pclk);
         apb_idle();

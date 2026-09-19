@@ -25,9 +25,13 @@ module apb_gpio #(
 
 
 // 无 wait state
-assign pready  = 1'b1;
+wire [3:0] reg_offset = paddr[5:2];
+wire valid_offset = (reg_offset == 4'h0) ||
+                    (reg_offset == 4'h1) ||
+                    (reg_offset == 4'h2);
 
-assign pslverr = 1'b0;
+assign pready  = 1'b1;
+assign pslverr = psel && penable && !valid_offset;
 
 
 // APB 写完成条件
@@ -37,7 +41,8 @@ assign apb_write =
         psel
       && penable
       && pwrite
-      && pready;
+      && pready
+      && valid_offset;
 
 
 // ==============================
@@ -56,7 +61,7 @@ always @(posedge pclk or negedge presetn) begin
 
         if (apb_write) begin
 
-            case (paddr[5:2])
+            case (reg_offset)
 
                 // offset 0x00
                 4'h0:
@@ -86,7 +91,7 @@ always @(*) begin
 
     prdata = 32'h0000_0000;
 
-    case (paddr[5:2])
+    case (reg_offset)
 
         // 0x00
         4'h0:
