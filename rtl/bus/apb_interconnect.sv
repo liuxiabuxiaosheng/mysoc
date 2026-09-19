@@ -52,6 +52,13 @@ module apb_interconnect (
     input  wire [31:0] dma_prdata,
     input  wire        dma_pready,
     input  wire        dma_pslverr
+    ,
+
+    // Audio control slave
+    output wire        audio_psel,
+    input  wire [31:0] audio_prdata,
+    input  wire        audio_pready,
+    input  wire        audio_pslverr
 );
 
 
@@ -59,6 +66,7 @@ wire gpio_sel;
 wire timer_sel;
 wire uart_sel;
 wire dma_sel;
+wire audio_sel;
 
 
 // GPIO:
@@ -83,11 +91,17 @@ assign uart_sel =
 assign dma_sel =
     (m_paddr[31:12] == 20'h40005);
 
+// Audio control:
+// 0x4000_3000 ~ 0x4000_3FFF
+assign audio_sel =
+    (m_paddr[31:12] == 20'h40003);
+
 
 assign gpio_psel  = m_psel && gpio_sel;
 assign timer_psel = m_psel && timer_sel;
 assign uart_psel  = m_psel && uart_sel;
 assign dma_psel   = m_psel && dma_sel;
+assign audio_psel = m_psel && audio_sel;
 
 
 // =========================
@@ -126,6 +140,13 @@ always @(*) begin
         m_prdata  = dma_prdata;
         m_pready  = dma_pready;
         m_pslverr = dma_pslverr;
+
+    end
+    else if (m_psel && audio_sel) begin
+
+        m_prdata  = audio_prdata;
+        m_pready  = audio_pready;
+        m_pslverr = audio_pslverr;
 
     end
     else if (m_psel) begin

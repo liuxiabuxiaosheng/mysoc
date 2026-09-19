@@ -39,7 +39,19 @@ module apb_subsystem (
     output wire [3:0]  dma_mem_req_wstrb,
     input  wire [31:0]  dma_mem_resp_rdata,
     input  wire         dma_mem_resp_ready,
-    input  wire         dma_mem_resp_error
+    input  wire         dma_mem_resp_error,
+
+    // Audio control/status and FIR configuration
+    output wire         audio_enable,
+    output wire         audio_bypass,
+    output wire         audio_clear_state,
+    output wire         audio_coeff_we,
+    output wire [3:0]   audio_coeff_index,
+    output wire signed [15:0] audio_coeff_data,
+    output wire [5:0]   audio_status_clear,
+    input  wire [5:0]   audio_status,
+    input  wire [31:0]  audio_sample_count,
+    input  wire signed [15:0] audio_last_output
 
 );
 
@@ -48,6 +60,7 @@ wire gpio_psel;
 wire timer_psel;
 wire uart_psel;
 wire dma_psel;
+wire audio_psel;
 
 
 // GPIO return
@@ -70,6 +83,9 @@ wire        uart_pslverr;
 wire [31:0] dma_prdata;
 wire        dma_pready;
 wire        dma_pslverr;
+wire [31:0] audio_prdata;
+wire        audio_pready;
+wire        audio_pslverr;
 
 
 
@@ -107,7 +123,11 @@ apb_interconnect u_apb_interconnect (
     .dma_psel       (dma_psel),
     .dma_prdata     (dma_prdata),
     .dma_pready     (dma_pready),
-    .dma_pslverr    (dma_pslverr)
+    .dma_pslverr    (dma_pslverr),
+    .audio_psel     (audio_psel),
+    .audio_prdata   (audio_prdata),
+    .audio_pready   (audio_pready),
+    .audio_pslverr  (audio_pslverr)
 
 );
 
@@ -209,6 +229,29 @@ dma_controller u_dma (
     .mem_resp_rdata (dma_mem_resp_rdata),
     .mem_resp_ready (dma_mem_resp_ready),
     .mem_resp_error (dma_mem_resp_error)
+);
+
+audio_ctrl u_audio_ctrl (
+    .clk             (clk),
+    .rst_n           (rst_n),
+    .paddr           (m_paddr),
+    .psel            (audio_psel),
+    .penable         (m_penable),
+    .pwrite          (m_pwrite),
+    .pwdata          (m_pwdata),
+    .prdata          (audio_prdata),
+    .pready          (audio_pready),
+    .pslverr         (audio_pslverr),
+    .audio_enable    (audio_enable),
+    .audio_bypass    (audio_bypass),
+    .audio_clear_state(audio_clear_state),
+    .coeff_we        (audio_coeff_we),
+    .coeff_index     (audio_coeff_index),
+    .coeff_data      (audio_coeff_data),
+    .status_clear    (audio_status_clear),
+    .status          (audio_status),
+    .sample_count    (audio_sample_count),
+    .last_output     (audio_last_output)
 );
 
 
