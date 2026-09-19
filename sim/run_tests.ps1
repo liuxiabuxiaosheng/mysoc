@@ -9,6 +9,7 @@ $Tests = [ordered]@{
     smoke           = "tb/common/tb_smoke.sv"
     onchip_ram      = "tb/memory/tb_onchip_ram.sv"
     cpu_apb_bridge  = "tb/bus/tb_cpu_apb_bridge.sv"
+    cpu_bus_decoder = "tb/bus/tb_cpu_bus_decoder.sv"
     apb_gpio        = "tb/peripheral/tb_apb_gpio.sv"
     apb_timer       = "tb/peripheral/tb_apb_timer.sv"
     uart_fifo       = "tb/peripheral/tb_uart_fifo.sv"
