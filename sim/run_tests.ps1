@@ -30,6 +30,8 @@ $Tests = [ordered]@{
     fir_filter      = "tb/audio/tb_fir_filter.sv"
     audio_ctrl      = "tb/peripheral/tb_audio_ctrl.sv"
     dma_audio_endpoints = "tb/dma/tb_dma_audio_endpoints.sv"
+    audio_pipeline   = "tb/audio/tb_audio_pipeline.sv"
+    soc_audio        = "tb/top/tb_soc_audio.sv"
 }
 
 $Selected = if ($Test -eq "all") { @($Tests.Keys) } else { @($Test) }

@@ -1,5 +1,6 @@
 module soc_top #(
-    parameter INTERNAL_CPU = 1'b0
+    parameter INTERNAL_CPU = 1'b0,
+    parameter EXTERNAL_AUDIO_CLOCK = 1'b0
 )(
     input  wire       clk_50m,
     input  wire       rst_n,
@@ -21,7 +22,9 @@ module soc_top #(
     output wire        cpu_resp_ready,
     output wire        cpu_resp_error,
     output wire        cpu_halted,
-    output wire [3:0]  cpu_fault_code
+    output wire [3:0]  cpu_fault_code,
+    input  wire        audio_clk,
+    input  wire        audio_rst_n
 );
 
 wire rst_sync;
@@ -48,6 +51,24 @@ wire [3:0]  dma_mem_req_wstrb;
 wire [31:0] dma_mem_resp_rdata;
 wire        dma_mem_resp_ready;
 wire        dma_mem_resp_error;
+wire        dma_fifo_in_valid;
+wire signed [15:0] dma_fifo_in_data;
+wire        dma_fifo_in_ready;
+wire        dma_fifo_out_ready;
+wire        dma_fifo_out_valid;
+wire signed [15:0] dma_fifo_out_data;
+wire        audio_enable;
+wire        audio_bypass;
+wire        audio_clear_state;
+wire        audio_coeff_we;
+wire [3:0]  audio_coeff_index;
+wire signed [15:0] audio_coeff_data;
+wire [5:0]  audio_status_clear;
+wire [5:0]  audio_status;
+wire [31:0] audio_sample_count;
+wire signed [15:0] audio_last_output;
+wire        audio_clk_used;
+wire        audio_rst_used;
 
 reg         ram_master_req_valid;
 reg         ram_master_req_write;
@@ -59,6 +80,9 @@ localparam [1:0] RAM_OWNER_NONE = 2'd0;
 localparam [1:0] RAM_OWNER_CPU  = 2'd1;
 localparam [1:0] RAM_OWNER_DMA  = 2'd2;
 reg [1:0] ram_owner;
+
+assign audio_clk_used = EXTERNAL_AUDIO_CLOCK ? audio_clk : clk_sys;
+assign audio_rst_used = EXTERNAL_AUDIO_CLOCK ? audio_rst_n : rst_sync;
 
 wire        apb_req_valid;
 wire        apb_req_write;
@@ -225,7 +249,46 @@ apb_subsystem u_apb_subsystem (
     .dma_mem_req_wstrb(dma_mem_req_wstrb),
     .dma_mem_resp_rdata(dma_mem_resp_rdata),
     .dma_mem_resp_ready(dma_mem_resp_ready),
-    .dma_mem_resp_error(dma_mem_resp_error)
+    .dma_mem_resp_error(dma_mem_resp_error),
+    .dma_fifo_in_valid(dma_fifo_in_valid),
+    .dma_fifo_in_data(dma_fifo_in_data),
+    .dma_fifo_in_ready(dma_fifo_in_ready),
+    .dma_fifo_out_ready(dma_fifo_out_ready),
+    .dma_fifo_out_valid(dma_fifo_out_valid),
+    .dma_fifo_out_data(dma_fifo_out_data),
+    .audio_enable(audio_enable),
+    .audio_bypass(audio_bypass),
+    .audio_clear_state(audio_clear_state),
+    .audio_coeff_we(audio_coeff_we),
+    .audio_coeff_index(audio_coeff_index),
+    .audio_coeff_data(audio_coeff_data),
+    .audio_status_clear(audio_status_clear),
+    .audio_status(audio_status),
+    .audio_sample_count(audio_sample_count),
+    .audio_last_output(audio_last_output)
+);
+
+audio_pipeline u_audio_pipeline (
+    .sys_clk(clk_sys),
+    .sys_rst_n(rst_sync),
+    .audio_clk(audio_clk_used),
+    .audio_rst_n(audio_rst_used),
+    .input_push_valid(dma_fifo_in_valid),
+    .input_push_data(dma_fifo_in_data),
+    .input_push_ready(dma_fifo_in_ready),
+    .output_pop_valid(dma_fifo_out_valid),
+    .output_pop_data(dma_fifo_out_data),
+    .output_pop_ready(dma_fifo_out_ready),
+    .enable(audio_enable),
+    .bypass(audio_bypass),
+    .clear_state(audio_clear_state),
+    .coeff_we(audio_coeff_we),
+    .coeff_index(audio_coeff_index),
+    .coeff_data(audio_coeff_data),
+    .status_clear(audio_status_clear),
+    .status(audio_status),
+    .sample_count(audio_sample_count),
+    .last_output(audio_last_output)
 );
 
 always @(*) begin
