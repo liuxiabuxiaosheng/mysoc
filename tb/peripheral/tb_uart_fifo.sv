@@ -47,6 +47,26 @@ module tb_uart_fifo;
         end
     endtask
 
+    task automatic read_write_byte(input logic [7:0] write_value,
+                                   input logic [7:0] expected_read_data,
+                                   input logic [2:0] expected_count);
+        begin
+            @(negedge clk);
+            wr_en = 1'b1;
+            wr_data = write_value;
+            rd_en = 1'b1;
+            @(posedge clk); #1;
+            wr_en = 1'b0;
+            rd_en = 1'b0;
+            if (rd_data !== expected_read_data)
+                $fatal(1, "simultaneous read/write data=%h expected=%h", rd_data, expected_read_data);
+            if (count !== expected_count)
+                $fatal(1, "simultaneous read/write count=%0d expected=%0d", count, expected_count);
+            if (empty !== 1'b0) $fatal(1, "simultaneous read/write should leave FIFO non-empty");
+            if (full !== 1'b0) $fatal(1, "simultaneous read/write should leave FIFO non-full");
+        end
+    endtask
+
     initial begin
         clk = 1'b0;
         rst_n = 1'b0;
@@ -69,13 +89,14 @@ module tb_uart_fifo;
 
         read_byte(8'h11, 3'd3, 1'b0);
         read_byte(8'h22, 3'd2, 1'b0);
-        write_byte(8'h55, 3'd3, 1'b0);
-        write_byte(8'h66, 3'd4, 1'b1);
-        read_byte(8'h33, 3'd3, 1'b0);
-        read_byte(8'h44, 3'd2, 1'b0);
-        read_byte(8'h55, 3'd1, 1'b0);
-        read_byte(8'h66, 3'd0, 1'b1);
-        read_byte(8'h66, 3'd0, 1'b1);
+        read_write_byte(8'h55, 8'h33, 3'd2);
+        read_byte(8'h44, 3'd1, 1'b0);
+        read_byte(8'h55, 3'd0, 1'b1);
+        write_byte(8'h66, 3'd1, 1'b0);
+        write_byte(8'h77, 3'd2, 1'b0);
+        read_byte(8'h66, 3'd1, 1'b0);
+        read_byte(8'h77, 3'd0, 1'b1);
+        read_byte(8'h77, 3'd0, 1'b1);
 
         $display("PASS tb_uart_fifo");
         $finish;

@@ -114,9 +114,13 @@ module tb_uart_rx;
             expect_byte(8'h3C, 1'b1);
         join
 
-        drive_bit(1'b0, BAUD_DIV / 2 - 1);
-        drive_bit(1'b1, BAUD_DIV * 3);
-        expect_no_byte(BAUD_DIV * 4);
+        fork
+            begin
+                drive_bit(1'b0, BAUD_DIV / 2 - 1);
+                drive_bit(1'b1, BAUD_DIV * 13);
+            end
+            expect_no_byte(BAUD_DIV * 12 + 8);
+        join
 
         $display("PASS tb_uart_rx");
         $finish;
