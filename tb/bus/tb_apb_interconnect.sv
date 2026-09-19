@@ -138,21 +138,27 @@ module tb_apb_interconnect;
         check(m_prdata == uart_prdata && !m_pready && !m_pslverr,
               "UART setup response was not propagated");
         enter_access();
-        check({uart_psel, timer_psel, gpio_psel} == 3'b100 && !m_pready,
-              "UART first wait cycle was not propagated");
         @(posedge pclk); #1;
+        check(uart_psel && !m_pready && m_prdata == uart_prdata &&
+              m_pslverr == uart_pslverr,
+              "UART wait response was not propagated on access cycle 1");
         check(m_paddr == 32'h4000_2000 && m_psel && m_penable && m_pwrite &&
               m_pwdata == 32'h0000_00C7,
               "master address/control changed during UART wait cycle 1");
         @(posedge pclk); #1;
+        check(uart_psel && !m_pready && m_prdata == uart_prdata &&
+              m_pslverr == uart_pslverr,
+              "UART wait response was not propagated on access cycle 2");
         check(m_paddr == 32'h4000_2000 && m_psel && m_penable && m_pwrite &&
               m_pwdata == 32'h0000_00C7,
               "master address/control changed during UART wait cycle 2");
+        @(negedge pclk);
         uart_pslverr = 1'b1;
         uart_pready  = 1'b1;
-        #1;
-        check(m_prdata == uart_prdata && m_pready && m_pslverr,
-              "UART completion response was not propagated");
+        @(posedge pclk); #1;
+        check(m_psel && m_penable && uart_psel && m_pready &&
+              m_prdata == uart_prdata && m_pslverr,
+              "UART transfer did not complete with a valid access response");
         finish_transfer();
 
         start_transfer(32'h4000_6000, 1'b0, 32'd0);
