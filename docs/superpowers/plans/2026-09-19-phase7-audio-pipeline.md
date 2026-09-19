@@ -28,10 +28,10 @@
 - Create: `tb/peripheral/tb_audio_ctrl.sv`
 - Modify: `sim/run_tests.ps1`
 
-- [ ] Test APB register reads/writes, coefficient programming, enable/bypass, sample count, and RW1C status clearing.
-- [ ] Run the focused test and observe the missing-module failure.
-- [ ] Implement the register bank and FIR configuration outputs with a stable APB ready/error response.
-- [ ] Verify `PASS tb_audio_ctrl` and commit `feat: add audio control peripheral`.
+- [x] Test APB register reads/writes, coefficient programming, enable/bypass, sample count, and RW1C status clearing.
+- [x] Run the focused test and observe the missing-module failure.
+- [x] Implement the register bank and FIR configuration outputs with a stable APB ready/error response.
+- [x] Verify `PASS tb_audio_ctrl` and commit `feat: add audio control peripheral`.
 
 ### Task 2: DMA audio FIFO endpoints
 
@@ -41,10 +41,10 @@
 - Create: `tb/dma/tb_dma_audio_endpoints.sv`
 - Modify: `sim/run_tests.ps1`
 
-- [ ] Add endpoint address parameters for input/output sample streams and 16-bit ready/valid handshakes.
-- [ ] Test BRAM-to-input-FIFO packing, output-FIFO-to-BRAM packing, endpoint backpressure, and endpoint errors.
-- [ ] Preserve the existing BRAM-to-BRAM path and register map.
-- [ ] Verify `PASS tb_dma_audio_endpoints` and commit `feat: add dma audio endpoints`.
+- [x] Add endpoint address parameters for input/output sample streams and 16-bit ready/valid handshakes.
+- [x] Test BRAM-to-input-FIFO packing, output-FIFO-to-BRAM packing, endpoint backpressure, and endpoint errors.
+- [x] Preserve the existing BRAM-to-BRAM path and register map.
+- [x] Verify `PASS tb_dma_audio_endpoints` and commit `feat: add dma audio endpoints`.
 
 ### Task 3: Audio pipeline wrapper and SoC wiring
 
@@ -54,11 +54,11 @@
 - Create: `tb/top/tb_soc_audio.sv`
 - Modify: `sim/run_tests.ps1`
 
-- [ ] Instantiate input/output `async_fifo` and `fir_filter` in the audio clock domain.
-- [ ] Connect audio control, coefficient, status, and sample-count signals.
-- [ ] Add system/audio clock and reset ports while preserving the existing default top-level behavior.
-- [ ] Write an end-to-end test that seeds BRAM, configures coefficients, runs both DMA directions, and checks every output sample against the Q1.15 model.
-- [ ] Verify `PASS tb_soc_audio` and commit `feat: integrate audio dma fifo fir pipeline`.
+- [x] Instantiate input/output `async_fifo` and `fir_filter` in the audio clock domain.
+- [x] Connect audio control, coefficient, status, and sample-count signals.
+- [x] Add system/audio clock and reset ports while preserving the existing default top-level behavior.
+- [x] Write an end-to-end test that seeds BRAM, configures coefficients, runs both DMA directions, and checks every output sample against the Q1.15 model.
+- [x] Verify `PASS tb_soc_audio` and commit `feat: integrate audio dma fifo fir pipeline`.
 
 ### Task 4: Regression and evidence
 
@@ -67,7 +67,7 @@
 - Modify: `FPGA_RISC_V_Audio_AI_SoC_Project_Plan.md`
 - Modify: `docs/FPGA_RISC_V_Audio_SoC_Implementation_Roadmap.md`
 
-- [ ] Run focused audio tests, full `sim/run_tests.ps1 -Test all`, and null elaboration for `apb_subsystem` and `soc_top`.
-- [ ] Record exact commands, sample packing, backpressure, status/error coverage, and non-goals.
-- [ ] Mark the integrated audio path as implemented while keeping physical audio, FFT, display, and AI outside scope.
+- [x] Run focused audio tests, full `sim/run_tests.ps1 -Test all`, and null elaboration for `apb_subsystem` and `soc_top`.
+- [x] Record exact commands, sample packing, backpressure, status/error coverage, and non-goals.
+- [x] Mark the integrated audio path as implemented while keeping physical audio, FFT, display, and AI outside scope.
 - [ ] Commit `docs: record phase-seven audio pipeline verification`.

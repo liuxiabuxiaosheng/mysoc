@@ -202,7 +202,7 @@ IDLE → READ_REQ → READ_WAIT → WRITE_REQ → WRITE_WAIT → DONE
 
 ## 7. 阶段六：Async FIFO与CDC
 
-状态：已完成独立 Async FIFO/CDC 原语验证；尚未接入音频处理链路。
+状态：已完成独立 Async FIFO/CDC 原语验证，并已接入阶段七系统级音频链路。
 
 ### 时钟域
 
@@ -228,7 +228,7 @@ IDLE → READ_REQ → READ_WAIT → WRITE_REQ → WRITE_WAIT → DONE
 
 ## 8. 阶段七：16阶定点FIR
 
-状态：独立 FIR 原语已完成并通过仿真；尚未接入 DMA/Async FIFO 音频链路。
+状态：独立 FIR 原语及 DMA/Async FIFO 音频链路均已完成并通过仿真。
 
 ### 数据格式
 
@@ -254,6 +254,8 @@ IDLE → READ_REQ → READ_WAIT → WRITE_REQ → WRITE_WAIT → DONE
 
 ## 9. 阶段八：系统级音频数据链路
 
+状态：已完成。实现文件为 `rtl/audio/audio_pipeline.sv`，端到端证据见 `docs/verification/phase7-audio-pipeline.md`。
+
 ```text
 CPU把数字音频样本写入BRAM
             ↓
@@ -278,6 +280,8 @@ CPU检查结果
 - 正常流程没有FIFO溢出或欠载。
 - 输出样本顺序正确。
 - 最终结果与软件黄金模型一致。
+
+实际验收还覆盖了 50 MHz 系统时钟、12.5 MHz 音频时钟、40 个样本的 DMA 双向搬运、输入 FIFO 反压、FIR 系数配置、样本计数和 FIFO 错误状态。
 
 完成该阶段后，项目可以准确描述为仿真验证的RISC-V Audio DSP SoC。
 
@@ -332,4 +336,4 @@ CPU检查结果
 
 下一个具体里程碑：
 
-> 为已验证的 RV32I CPU 和 DMA 链路加入软件启动目录、链接脚本、启动代码和可加载的 BRAM 固件镜像，完成 CPU 配置 GPIO、UART、Timer 和 DMA 的裸机闭环。
+> 为已验证的 RV32I CPU 和 DMA/音频链路加入软件启动目录、链接脚本、启动代码和可加载的 BRAM 固件镜像，完成 CPU 配置 GPIO、UART、Timer 和 DMA 的裸机闭环；随后进入 Vivado 时钟、约束和板级验证。

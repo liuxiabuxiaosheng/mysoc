@@ -106,9 +106,10 @@
 | APB/GPIO/Timer/UART Testbench | 已实现并通过完整回归 | 完整回归共 10 个测试，包含单元、互连、子系统和顶层 smoke 测试。 |
 | BRAM / SRAM / ROM | 已实现并通过回归 | 已实现 64 KiB on-chip RAM、字节写使能和初始化文件接口。 |
 | RISC-V CPU、CPU memory bus、APB bridge | 已实现并通过回归 | 多周期 RV32I CPU 可通过 CPU bus 访问 BRAM 和 APB 外设。 |
-| DMA | 已实现并通过回归 | 单通道 BRAM-to-BRAM DMA，含 APB 配置、状态机、错误状态和 CPU/DMA RAM 仲裁；详见 `docs/verification/phase4-dma.md`。 |
+| DMA | 已实现并通过回归 | 单通道 BRAM-to-BRAM DMA，并支持 BRAM→音频输入 FIFO、音频输出 FIFO→BRAM 端点；含 APB 配置、状态机、错误状态和 CPU/DMA RAM 仲裁。 |
 | CDC / Async FIFO 集成 | 已实现并通过回归 | 参数化 Gray-pointer Async FIFO，默认 16-bit×16，覆盖满/空、回绕、溢出/欠载和独立复位释放。详见 `docs/verification/phase5-async-fifo.md`。 |
-| FIR | 已实现并通过回归 | 独立 16 阶 Q1.15 FIR，覆盖 MAC、舍入、饱和和 valid-ready backpressure；详见 `docs/verification/phase6-fir.md`。 |
+| FIR | 已实现并通过回归 | 独立 16 阶 Q1.15 FIR，覆盖 MAC、舍入、饱和和 valid-ready backpressure；已接入双 Async FIFO 和 DMA，详见 `docs/verification/phase7-audio-pipeline.md`。 |
+| Audio DMA/FIFO/FIR pipeline | 已实现并通过回归 | `BRAM → DMA → Async FIFO → FIR → Async FIFO → DMA → BRAM` 端到端 50 MHz/12.5 MHz 双时钟仿真通过。 |
 | VGA / TFT / Display | 未实现 | 尚无显示时序、帧缓冲或物理显示输出。 |
 | FFT | 未实现 | 不属于当前 MVP 的已实现功能。 |
 | 物理音频输入输出 | 未实现 | 尚未接入 ADC、DAC、I2S 或板级音频接口。 |
@@ -120,7 +121,7 @@
 1.  BRAM、CPU memory bus、APB bridge，以及带指令测试的 multi-cycle RV32I。
 2.  裸机固件镜像生成和 CPU/外设集成。
 3.  DMA、异步 FIFO、定点 FIR 和 golden-model 验证。
-4.  完整 SoC 集成、Vivado Clocking Wizard、XDC、综合、时序和资源报告。
+4.  完整 SoC 集成已在仿真完成；下一步为 Vivado Clocking Wizard、XDC、综合、时序和资源报告。
 
 ------------------------------------------------------------------------
 
