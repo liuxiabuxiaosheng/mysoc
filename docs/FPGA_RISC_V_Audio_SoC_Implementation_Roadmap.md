@@ -202,6 +202,8 @@ IDLE → READ_REQ → READ_WAIT → WRITE_REQ → WRITE_WAIT → DONE
 
 ## 7. 阶段六：Async FIFO与CDC
 
+状态：已完成独立 Async FIFO/CDC 原语验证；尚未接入音频处理链路。
+
 ### 时钟域
 
 ```text
@@ -318,7 +320,7 @@ CPU检查结果
 | 2 | 多周期RV32I | 完成项目核心处理器 |
 | 3 | 软件启动 | UART输出第一条CPU程序信息 |
 | 4 | DMA | 已完成：建立硬件数据搬运通路 |
-| 5 | Async FIFO | 完成CDC数据传输 |
+| 5 | Async FIFO | 已完成：完成 CDC 数据传输 |
 | 6 | FIR | 完成硬件音频加速 |
 | 7 | 系统集成 | 完成Audio DSP SoC数据链路 |
 | 8 | Vivado | 获得资源和时序结果 |

@@ -107,7 +107,7 @@
 | BRAM / SRAM / ROM | 已实现并通过回归 | 已实现 64 KiB on-chip RAM、字节写使能和初始化文件接口。 |
 | RISC-V CPU、CPU memory bus、APB bridge | 已实现并通过回归 | 多周期 RV32I CPU 可通过 CPU bus 访问 BRAM 和 APB 外设。 |
 | DMA | 已实现并通过回归 | 单通道 BRAM-to-BRAM DMA，含 APB 配置、状态机、错误状态和 CPU/DMA RAM 仲裁；详见 `docs/verification/phase4-dma.md`。 |
-| CDC / Async FIFO 集成 | 未实现 | 当前没有多时钟域数据通路。 |
+| CDC / Async FIFO 集成 | 已实现并通过回归 | 参数化 Gray-pointer Async FIFO，默认 16-bit×16，覆盖满/空、回绕、溢出/欠载和独立复位释放。详见 `docs/verification/phase5-async-fifo.md`。 |
 | FIR | 未实现 | 尚无定点 FIR RTL 或 golden model 验证。 |
 | VGA / TFT / Display | 未实现 | 尚无显示时序、帧缓冲或物理显示输出。 |
 | FFT | 未实现 | 不属于当前 MVP 的已实现功能。 |
