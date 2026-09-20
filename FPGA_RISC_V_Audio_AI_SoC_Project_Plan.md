@@ -93,7 +93,7 @@
 
 ------------------------------------------------------------------------
 
-# 当前实现状态（2026-09-19）
+# 当前实现状态（2026-09-20）
 
 本节记录当前仓库中已经实现并实际验证的范围，不替代后续路线图。Phase 1 的完整回归在 Icarus Verilog 13.0 下通过 10 个测试；详细命令、测试名和寄存器映射见 `docs/verification/phase1-apb-peripherals.md`。
 
@@ -102,11 +102,13 @@
 | APB Interconnect | 已实现并通过回归 | GPIO、Timer、UART 三个 4 KiB 窗口；未映射访问返回错误。 |
 | GPIO | 已实现并通过回归 | 数据、方向和输入寄存器，以及非法偏移错误响应。 |
 | Timer | 已实现并通过回归 | Counter、Compare、单次/周期工作和中断状态。 |
-| UART | 已实现并通过回归 | TX/RX、TX/RX FIFO、APB 寄存器和错误状态；当前顶层未暴露 UART 中断。 |
-| APB/GPIO/Timer/UART Testbench | 已实现并通过完整回归 | 完整回归共 10 个测试，包含单元、互连、子系统和顶层 smoke 测试。 |
+| UART | 已实现并通过回归 | TX/RX、TX/RX FIFO、APB 寄存器、错误状态和可屏蔽 RX/Error IRQ。 |
+| APB/GPIO/Timer/UART Testbench | 已实现并通过完整回归 | 单元、互连、子系统、IRQ 和顶层 smoke 测试均通过。 |
 | BRAM / SRAM / ROM | 已实现并通过回归 | 已实现 64 KiB on-chip RAM、字节写使能和初始化文件接口。 |
 | RISC-V CPU、CPU memory bus、APB bridge | 已实现并通过回归 | 多周期 RV32I CPU 可通过 CPU bus 访问 BRAM 和 APB 外设。 |
-| DMA | 已实现并通过回归 | 单通道 BRAM-to-BRAM DMA，并支持 BRAM→音频输入 FIFO、音频输出 FIFO→BRAM 端点；含 APB 配置、状态机、错误状态和 CPU/DMA RAM 仲裁。 |
+| RV32IM、Machine CSR 和 Trap | 已实现并通过回归 | 支持 CSR 读写、ECALL/EBREAK/MRET/WFI、Direct mtvec、异常保存恢复和 MUL/DIV/REM。 |
+| Timer/DMA/UART IRQ | 已实现并通过回归 | Timer 接 MTIP，DMA/UART 经 APB IRQ Controller 汇聚为 MEIP；支持 enable/pending/clear。 |
+| DMA | 已实现并通过回归 | 单通道 BRAM-to-BRAM DMA，并支持 BRAM→音频输入 FIFO、音频输出 FIFO→BRAM 端点；含 APB 配置、状态机、错误状态、IRQ 和 CPU/DMA RAM 仲裁。 |
 | CDC / Async FIFO 集成 | 已实现并通过回归 | 参数化 Gray-pointer Async FIFO，默认 16-bit×16，覆盖满/空、回绕、溢出/欠载和独立复位释放。详见 `docs/verification/phase5-async-fifo.md`。 |
 | FIR | 已实现并通过回归 | 独立 16 阶 Q1.15 FIR，覆盖 MAC、舍入、饱和和 valid-ready backpressure；已接入双 Async FIFO 和 DMA，详见 `docs/verification/phase7-audio-pipeline.md`。 |
 | Audio DMA/FIFO/FIR pipeline | 已实现并通过回归 | `BRAM → DMA → Async FIFO → FIR → Async FIFO → DMA → BRAM` 端到端 50 MHz/12.5 MHz 双时钟仿真通过。 |

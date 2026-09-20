@@ -27,7 +27,8 @@ module uart_regs (
 
     output wire        tx_enable,
     output wire        rx_enable,
-    output wire [31:0] baud_div
+    output wire [31:0] baud_div,
+    output wire        irq
 );
 
 reg [31:0] ctrl_reg;
@@ -66,6 +67,7 @@ assign baud_write = apb_access && pwrite && baud_offset && !rx_read_wait;
 assign tx_enable = ctrl_reg[0];
 assign rx_enable = ctrl_reg[1];
 assign baud_div  = baud_reg;
+assign irq        = ctrl_reg[2] && ((!rx_fifo_empty) || frame_error_sticky || overflow_sticky);
 
 assign tx_write_illegal = data_write && (!tx_enable || tx_fifo_full);
 assign rx_read_illegal  = data_read && (!rx_enable || rx_fifo_empty);
@@ -99,7 +101,7 @@ always_ff @(posedge pclk or negedge presetn) begin
         rx_read_wait       <= 1'b0;
     end else begin
         if (ctrl_write && !pslverr)
-            ctrl_reg <= {30'd0, pwdata[1:0]};
+            ctrl_reg <= {29'd0, pwdata[2:0]};
 
         if (baud_write && !pslverr)
             baud_reg <= (pwdata < 32'd8) ? 32'd8 : pwdata;

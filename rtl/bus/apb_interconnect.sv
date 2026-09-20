@@ -58,7 +58,12 @@ module apb_interconnect (
     output wire        audio_psel,
     input  wire [31:0] audio_prdata,
     input  wire        audio_pready,
-    input  wire        audio_pslverr
+    input  wire        audio_pslverr,
+
+    output wire        irq_psel,
+    input  wire [31:0] irq_prdata,
+    input  wire        irq_pready,
+    input  wire        irq_pslverr
 );
 
 
@@ -67,6 +72,7 @@ wire timer_sel;
 wire uart_sel;
 wire dma_sel;
 wire audio_sel;
+wire irq_sel;
 
 
 // GPIO:
@@ -95,6 +101,8 @@ assign dma_sel =
 // 0x4000_3000 ~ 0x4000_3FFF
 assign audio_sel =
     (m_paddr[31:12] == 20'h40003);
+assign irq_sel =
+    (m_paddr[31:12] == 20'h40007);
 
 
 assign gpio_psel  = m_psel && gpio_sel;
@@ -102,6 +110,7 @@ assign timer_psel = m_psel && timer_sel;
 assign uart_psel  = m_psel && uart_sel;
 assign dma_psel   = m_psel && dma_sel;
 assign audio_psel = m_psel && audio_sel;
+assign irq_psel = m_psel && irq_sel;
 
 
 // =========================
@@ -147,6 +156,13 @@ always @(*) begin
         m_prdata  = audio_prdata;
         m_pready  = audio_pready;
         m_pslverr = audio_pslverr;
+
+    end
+    else if (m_psel && irq_sel) begin
+
+        m_prdata  = irq_prdata;
+        m_pready  = irq_pready;
+        m_pslverr = irq_pslverr;
 
     end
     else if (m_psel) begin

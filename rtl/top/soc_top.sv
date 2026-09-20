@@ -69,6 +69,8 @@ wire [31:0] audio_sample_count;
 wire signed [15:0] audio_last_output;
 wire        audio_clk_used;
 wire        audio_rst_used;
+wire        cpu_timer_irq;
+wire        cpu_external_irq;
 
 reg         ram_master_req_valid;
 reg         ram_master_req_write;
@@ -125,7 +127,8 @@ generate
             .mem_req_addr(bus_cpu_req_addr), .mem_req_wdata(bus_cpu_req_wdata),
             .mem_req_wstrb(bus_cpu_req_wstrb),
             .mem_resp_rdata(decoder_resp_rdata), .mem_resp_ready(decoder_resp_ready),
-            .mem_resp_error(decoder_resp_error), .halted(core_halted),
+            .mem_resp_error(decoder_resp_error), .irq_timer(cpu_timer_irq),
+            .irq_external(cpu_external_irq), .halted(core_halted),
             .fault_code(core_fault_code), .dbg_pc()
         );
     end else begin : g_external_cpu
@@ -240,6 +243,8 @@ apb_subsystem u_apb_subsystem (
     .gpio_out(gpio_out),
     .gpio_dir(gpio_dir),
     .timer_irq(timer_irq),
+    .cpu_timer_irq(cpu_timer_irq),
+    .cpu_external_irq(cpu_external_irq),
     .uart_rx(uart_rx),
     .uart_tx(uart_tx),
     .dma_mem_req_valid(dma_mem_req_valid),
