@@ -41,7 +41,27 @@ AX7010 PL oscillator (assumed 50 MHz)
 - `rtl/common/clk_gen.sv`
   - 当前实现为 `assign clk_sys = clk_in`。
 
-## 3. 当前不能确认的内容
+## 3. 用户照片确认的板卡特征
+
+用户提供的实物照片与 AX7010 项目目标一致，可以观察到：
+
+- PCB 上有明显的 `ALINX` 标识；
+- 中央为 Zynq-7000 器件区域；
+- 顶部扩展连接器标注为 `J10`，底部扩展连接器标注为 `J11`；
+- 两组扩展口均为 2×20 排针形式，对应 40-pin 扩展接口；
+- 板上可见 `JTAG`、`USB HOST`、`USB SLAVE`、`HDMI` 和以太网接口；
+- 板上有 `PS KEY`、`PL KEY`、`PL LED`、`DONE` 等 PS/PL 调试和用户 I/O 标识。
+
+照片能够确认板卡型号和接口形态，但不能直接确认：
+
+- FPGA 芯片完整订货号及速度/温度等级；
+- 50 MHz 振荡器连接到 FPGA 的具体球位；
+- J10/J11 每一针对应的 FPGA `PACKAGE_PIN`；
+- 某一组扩展口是否已经连接到特定 Codec。
+
+因此，照片证据支持“目标板为 AX7010、使用 40-pin 扩展口”的结论，但不能替代 AX7010 原理图或官方 master XDC。
+
+## 4. 当前不能确认的内容
 
 仓库中没有 AX7010 的官方原理图、40-pin 扩展口针脚表或可直接使用的完整 XDC，因此以下内容不能凭空填写：
 
@@ -53,7 +73,7 @@ AX7010 PL oscillator (assumed 50 MHz)
 
 现有文件 `constraints/ax7010_i2s_template.xdc` 仍然只是模板，明确要求根据 Codec 和 AX7010 原理图替换占位符，不能直接用于实现。
 
-## 4. 本阶段的边界
+## 5. 本阶段的边界
 
 本次核对只确认了项目级时钟和器件假设，没有声称已经完成：
 
@@ -63,7 +83,7 @@ AX7010 PL oscillator (assumed 50 MHz)
 - Clocking Wizard 生成 100 MHz/12.5 MHz 时钟；
 - 综合、实现、时序或 PPA 报告。
 
-## 5. 进入真实约束前需要补齐的资料
+## 6. 进入真实约束前需要补齐的资料
 
 1. AX7010 对应版本的原理图或官方 master XDC。
 2. 板卡上实际使用的 FPGA 完整 part name。
