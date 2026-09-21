@@ -334,6 +334,8 @@ CPU检查结果
 
 ## 13. 下一步
 
+第二阶段已增加通用 16-bit stereo I2S slave RX/TX 与异步 FIFO 桥接原语。AX7010 的具体管脚、Codec 电气标准和 I2S 输入输出延迟仍需依据选定外接音频模块填写 `constraints/ax7010_i2s_template.xdc`，不能在未选定 Codec 时假定固定值。
+
 下一个具体里程碑：
 
 > 为已验证的 RV32I CPU 和 DMA/音频链路加入软件启动目录、链接脚本、启动代码和可加载的 BRAM 固件镜像，完成 CPU 配置 GPIO、UART、Timer 和 DMA 的裸机闭环；随后进入 Vivado 时钟、约束和板级验证。

@@ -1,6 +1,7 @@
 module soc_top #(
     parameter INTERNAL_CPU = 1'b0,
-    parameter EXTERNAL_AUDIO_CLOCK = 1'b0
+    parameter EXTERNAL_AUDIO_CLOCK = 1'b0,
+    parameter I2S_ENABLE = 1'b0
 )(
     input  wire       clk_50m,
     input  wire       rst_n,
@@ -24,7 +25,11 @@ module soc_top #(
     output wire        cpu_halted,
     output wire [3:0]  cpu_fault_code,
     input  wire        audio_clk,
-    input  wire        audio_rst_n
+    input  wire        audio_rst_n,
+    input  wire        i2s_bclk,
+    input  wire        i2s_lrclk,
+    input  wire        i2s_sdata_in,
+    output wire        i2s_sdata_out
 );
 
 wire rst_sync;
@@ -69,6 +74,14 @@ wire [31:0] audio_sample_count;
 wire signed [15:0] audio_last_output;
 wire        audio_clk_used;
 wire        audio_rst_used;
+wire        i2s_audio_in_valid, i2s_audio_in_ready;
+wire signed [15:0] i2s_audio_in_data;
+wire        i2s_audio_out_valid, i2s_audio_out_ready;
+wire signed [15:0] i2s_audio_out_data;
+wire        pipeline_in_valid, pipeline_in_ready;
+wire signed [15:0] pipeline_in_data;
+wire        pipeline_out_valid, pipeline_out_ready;
+wire signed [15:0] pipeline_out_data;
 wire        cpu_timer_irq;
 wire        cpu_external_irq;
 
@@ -294,6 +307,15 @@ audio_pipeline u_audio_pipeline (
     .status(audio_status),
     .sample_count(audio_sample_count),
     .last_output(audio_last_output)
+);
+
+i2s_audio_bridge u_i2s_bridge (
+    .i2s_bclk(i2s_bclk), .i2s_lrclk(i2s_lrclk), .i2s_sdata_in(i2s_sdata_in),
+    .i2s_sdata_out(i2s_sdata_out), .i2s_rst_n(audio_rst_n),
+    .audio_clk(audio_clk_used), .audio_rst_n(audio_rst_used),
+    .audio_in_valid(), .audio_in_data(), .audio_in_ready(1'b0),
+    .audio_out_valid(1'b0), .audio_out_data(16'd0), .audio_out_ready(),
+    .rx_overflow(), .rx_frame_error(), .tx_underflow()
 );
 
 always @(*) begin
