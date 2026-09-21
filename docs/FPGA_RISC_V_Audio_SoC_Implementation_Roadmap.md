@@ -298,6 +298,13 @@ CPU检查结果
 - 运行综合、实现和时序分析。
 - 记录LUT、FF、BRAM、DSP和Fmax。
 
+### 当前核对状态（2026-09-21）
+
+- 已完成项目资料级板卡核对：目标板为 AX7010，PL 主时钟按 50 MHz 规划，顶层端口为 `soc_top.clk_50m`。
+- 目标器件的完整 part name 在不同设计文档中存在 `XC7Z010CLG400-1` 与 `XC7Z010-1CLG400I` 两种写法，需以板卡丝印或 Vivado 器件选择器最终确认。
+- 尚未找到 AX7010 官方 master XDC/原理图，因此未填写 `PACKAGE_PIN`，也未把 I2S 扩展口管脚当作已确认事实。
+- 详细核对记录见 `docs/verification/phase9-board-clock-pin-audit.md`。
+
 ### 第一版上板验收
 
 - CPU启动成功。
