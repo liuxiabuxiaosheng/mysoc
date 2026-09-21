@@ -10,7 +10,16 @@ module riscv_decoder (
     output logic        alu_src_imm,
     output logic [4:0]  alu_op,
     output logic [1:0]  load_size,
-    output logic        load_unsigned
+    output logic        load_unsigned,
+    output logic        csr_valid,
+    output logic [2:0]  csr_cmd,
+    output logic        csr_imm,
+    output logic        system_ecall,
+    output logic        system_ebreak,
+    output logic        system_mret,
+    output logic        system_wfi,
+    output logic        m_ext,
+    output logic [2:0]  m_ext_op
 );
     localparam ALU_ADD=5'd0, ALU_SUB=5'd1, ALU_SLL=5'd2, ALU_SLT=5'd3,
                ALU_SLTU=5'd4, ALU_XOR=5'd5, ALU_SRL=5'd6, ALU_SRA=5'd7,
@@ -21,6 +30,9 @@ module riscv_decoder (
         valid=1'b0; reg_write=1'b0; mem_read=1'b0; mem_write=1'b0;
         branch=1'b0; jump=1'b0; jalr=1'b0; alu_src_imm=1'b0;
         alu_op=ALU_ADD; load_size=2'd2; load_unsigned=1'b0;
+        csr_valid=1'b0; csr_cmd=3'd0; csr_imm=1'b0;
+        system_ecall=1'b0; system_ebreak=1'b0; system_mret=1'b0; system_wfi=1'b0;
+        m_ext=1'b0; m_ext_op=3'd0;
         case (opcode)
             7'b0110111: begin valid=1; reg_write=1; alu_src_imm=1; end // LUI
             7'b0010111: begin valid=1; reg_write=1; alu_src_imm=1; end // AUIPC
@@ -54,7 +66,10 @@ module riscv_decoder (
             end
             7'b0110011: begin
                 valid=1; reg_write=1;
-                case ({instr[30],instr[14:12]})
+                if (instr[31:25] == 7'b0000001) begin
+                    m_ext = 1'b1;
+                    m_ext_op = instr[14:12];
+                end else case ({instr[30],instr[14:12]})
                     4'b0000: alu_op=ALU_ADD; 4'b1000: alu_op=ALU_SUB;
                     4'b0001: alu_op=ALU_SLL; 4'b0010: alu_op=ALU_SLT;
                     4'b0011: alu_op=ALU_SLTU; 4'b0100: alu_op=ALU_XOR;
@@ -62,6 +77,28 @@ module riscv_decoder (
                     4'b0110: alu_op=ALU_OR; 4'b0111: alu_op=ALU_AND;
                     default: valid=0;
                 endcase
+            end
+            7'b1110011: begin
+                if (instr[14:12] != 3'b000) begin
+                    valid = 1'b1;
+                    reg_write = 1'b1;
+                    csr_valid = 1'b1;
+                    csr_imm = instr[14];
+                    case (instr[14:12])
+                        3'b001, 3'b101: csr_cmd = 3'd1;
+                        3'b010, 3'b110: csr_cmd = 3'd2;
+                        3'b011, 3'b111: csr_cmd = 3'd3;
+                        default: begin valid=1'b0; csr_valid=1'b0; end
+                    endcase
+                end else begin
+                    case (instr[31:20])
+                        12'h000: begin valid=1'b1; system_ecall=1'b1; end
+                        12'h001: begin valid=1'b1; system_ebreak=1'b1; end
+                        12'h302: begin valid=1'b1; system_mret=1'b1; end
+                        12'h105: begin valid=1'b1; system_wfi=1'b1; end
+                        default: valid=1'b0;
+                    endcase
+                end
             end
             default: valid=0;
         endcase

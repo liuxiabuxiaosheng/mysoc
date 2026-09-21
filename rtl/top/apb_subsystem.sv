@@ -25,6 +25,8 @@ module apb_subsystem (
     // Timer
 
     output wire        timer_irq,
+    output wire        cpu_timer_irq,
+    output wire        cpu_external_irq,
 
     // UART
 
@@ -67,6 +69,7 @@ wire timer_psel;
 wire uart_psel;
 wire dma_psel;
 wire audio_psel;
+wire irq_psel;
 
 
 // GPIO return
@@ -92,6 +95,11 @@ wire        dma_pslverr;
 wire [31:0] audio_prdata;
 wire        audio_pready;
 wire        audio_pslverr;
+wire [31:0] irq_prdata;
+wire        irq_pready;
+wire        irq_pslverr;
+wire        dma_irq;
+wire        uart_irq;
 
 
 
@@ -133,7 +141,11 @@ apb_interconnect u_apb_interconnect (
     .audio_psel     (audio_psel),
     .audio_prdata   (audio_prdata),
     .audio_pready   (audio_pready),
-    .audio_pslverr  (audio_pslverr)
+    .audio_pslverr  (audio_pslverr),
+    .irq_psel       (irq_psel),
+    .irq_prdata     (irq_prdata),
+    .irq_pready     (irq_pready),
+    .irq_pslverr    (irq_pslverr)
 
 );
 
@@ -212,7 +224,8 @@ uart_top u_uart (
     .pslverr    (uart_pslverr),
 
     .rx         (uart_rx),
-    .tx         (uart_tx)
+    .tx         (uart_tx),
+    .irq        (uart_irq)
 
 );
 
@@ -240,7 +253,26 @@ dma_controller u_dma (
     .fifo_in_ready  (dma_fifo_in_ready),
     .fifo_out_ready (dma_fifo_out_ready),
     .fifo_out_valid (dma_fifo_out_valid),
-    .fifo_out_data  (dma_fifo_out_data)
+    .fifo_out_data  (dma_fifo_out_data),
+    .irq            (dma_irq)
+);
+
+irq_controller u_irq_controller (
+    .clk            (clk),
+    .rst_n          (rst_n),
+    .paddr          (m_paddr),
+    .psel           (irq_psel),
+    .penable        (m_penable),
+    .pwrite         (m_pwrite),
+    .pwdata         (m_pwdata),
+    .prdata         (irq_prdata),
+    .pready         (irq_pready),
+    .pslverr        (irq_pslverr),
+    .timer_src      (timer_irq),
+    .dma_src        (dma_irq),
+    .uart_src       (uart_irq),
+    .cpu_timer_irq  (cpu_timer_irq),
+    .cpu_external_irq(cpu_external_irq)
 );
 
 audio_ctrl u_audio_ctrl (

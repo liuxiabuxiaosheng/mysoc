@@ -25,7 +25,8 @@ module dma_controller #(
     input  logic        fifo_in_ready,
     output logic        fifo_out_ready,
     input  logic        fifo_out_valid,
-    input  logic signed [15:0] fifo_out_data
+    input  logic signed [15:0] fifo_out_data,
+    output logic        irq
 );
     typedef enum logic [3:0] {
         IDLE, READ_REQ, READ_WAIT, WRITE_REQ, WRITE_WAIT,
@@ -76,6 +77,8 @@ module dma_controller #(
         fifo_in_data  = (state == IN_PUSH_LO) ? read_data_q[15:0] : read_data_q[31:16];
         fifo_out_ready = (state == OUT_POP_LO) || (state == OUT_POP_HI);
     end
+
+    assign irq = done_q || config_error_q || bus_error_q;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

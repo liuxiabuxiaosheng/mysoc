@@ -13,7 +13,8 @@ module uart_top (
     output wire        pslverr,
 
     input  wire        rx,
-    output wire        tx
+    output wire        tx,
+    output wire        irq
 );
 
 wire        tx_fifo_empty;
@@ -34,6 +35,7 @@ logic       rx_fifo_wr_en;
 wire        tx_enable;
 wire        rx_enable;
 wire [31:0] baud_div;
+wire        regs_irq;
 
 logic [7:0] tx_data;
 logic       tx_start;
@@ -125,8 +127,11 @@ uart_regs u_regs (
     .overflow_set(overflow_set),
     .tx_enable(tx_enable),
     .rx_enable(rx_enable),
-    .baud_div(baud_div)
+    .baud_div(baud_div),
+    .irq(regs_irq)
 );
+
+assign irq = regs_irq;
 
 assign frame_error_set = rx_valid && rx_enable && rx_frame_error;
 assign overflow_set    = rx_valid && rx_enable && rx_fifo_full;
