@@ -40,6 +40,7 @@ $Tests = [ordered]@{
     audio_pipeline   = "tb/audio/tb_audio_pipeline.sv"
     soc_audio        = "tb/top/tb_soc_audio.sv"
     i2s_rx_slave     = "tb/audio/tb_i2s_rx_slave.sv"
+    i2s_tx_slave     = "tb/audio/tb_i2s_tx_slave.sv"
 }
 
 $Selected = if ($Test -eq "all") { @($Tests.Keys) } else { @($Test) }
