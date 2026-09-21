@@ -41,6 +41,15 @@ AX7010 PL oscillator (assumed 50 MHz)
 - `rtl/common/clk_gen.sv`
   - 当前实现为 `assign clk_sys = clk_in`。
 
+官方示例约束和开发板原理图进一步确认了以下板级连接：
+
+- `U18`：50 MHz PL 时钟输入；
+- `N15`：PL 按键/复位输入；
+- `J19`：UART RX；
+- `K19`：UART TX；
+- `M14`、`M15`、`K16`、`J16`：四个 PL LED；
+- `J10`、`J11`：40-pin 扩展口，具体 I2S 信号仍需按所选 Codec 分配。
+
 ## 3. 用户照片确认的板卡特征
 
 用户提供的实物照片与 AX7010 项目目标一致，可以观察到：
@@ -63,13 +72,14 @@ AX7010 PL oscillator (assumed 50 MHz)
 
 ## 4. 当前不能确认的内容
 
-仓库中没有 AX7010 的官方原理图、40-pin 扩展口针脚表或可直接使用的完整 XDC，因此以下内容不能凭空填写：
+虽然官方示例和原理图已经确认了时钟、复位、UART 以及 PL LED 的管脚，但以下内容仍不能凭空填写：
 
-- `clk_50m` 对应的 FPGA `PACKAGE_PIN`；
 - `i2s_bclk`、`i2s_lrclk`、`i2s_sdata_in`、`i2s_sdata_out` 对应的 40-pin 扩展口管脚；
 - 外接 Codec 型号、I/O 电平和驱动时序；
 - I2S BCLK 周期、输入延迟和输出延迟；
-- 复位、UART、GPIO 和其他板级接口的实际管脚。
+- 其余 GPIO/按键信号在本项目板级封装中的具体分配。
+
+本次用户补充了官方示例 XDC 和原理图后，时钟、复位和 UART 管脚已完成交叉核验，并写入 `constraints/ax7010_soc.xdc`。当前仍未将 I2S 扩展口管脚写成生效约束。
 
 现有文件 `constraints/ax7010_i2s_template.xdc` 仍然只是模板，明确要求根据 Codec 和 AX7010 原理图替换占位符，不能直接用于实现。
 
@@ -77,7 +87,7 @@ AX7010 PL oscillator (assumed 50 MHz)
 
 本次核对只确认了项目级时钟和器件假设，没有声称已经完成：
 
-- AX7010 实际管脚绑定；
+- I2S 和其余未使用接口的 AX7010 实际管脚绑定；
 - Vivado 工程创建；
 - 50 MHz 主时钟 XDC 的板级验证；
 - Clocking Wizard 生成 100 MHz/12.5 MHz 时钟；
