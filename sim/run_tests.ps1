@@ -29,6 +29,7 @@ $Tests = [ordered]@{
     apb_interconnect = "tb/bus/tb_apb_interconnect.sv"
     apb_subsystem   = "tb/top/tb_apb_subsystem.sv"
     soc_top         = "tb/top/tb_soc_top.sv"
+    board_top       = "tb/top/tb_board_top.sv"
     soc_cpu         = "tb/top/tb_soc_cpu.sv"
     dma_controller  = "tb/dma/tb_dma_controller.sv"
     apb_dma         = "tb/peripheral/tb_apb_dma.sv"
