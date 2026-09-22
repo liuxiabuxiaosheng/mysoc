@@ -24,10 +24,9 @@ set_property IOSTANDARD LVCMOS33 [get_ports {uart_rx}]
 set_property PACKAGE_PIN K19 [get_ports {uart_tx}]
 set_property IOSTANDARD LVCMOS33 [get_ports {uart_tx}]
 
-# LED1. It displays completion of reset and clock initialization through
-# soc_top.phase1_ready, making the first board-level bitstream observable.
-set_property PACKAGE_PIN M14 [get_ports {phase1_ready}]
-set_property IOSTANDARD LVCMOS33 [get_ports {phase1_ready}]
+# LED1 shows board-top reset and clock readiness.
+set_property PACKAGE_PIN M14 [get_ports {led[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {led[0]}]
 
 # Optional user LEDs. Uncomment only after the physical top-level exposes
 # led[3:0]; these cannot be applied to the current soc_top.

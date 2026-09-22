@@ -21,24 +21,21 @@ clk_50m, rst_n, uart_rx -> board_top -> soc_top -> uart_tx
                                      +-> phase1_ready -> led[0]
 ```
 
-`board_top` instantiates `soc_top` with `INTERNAL_CPU=1'b1` and sets its RAM
-initialization parameter to `firmware/hello_uart.hex`. It ties unused logical
+`board_top` instantiates `soc_top` with `INTERNAL_CPU=1'b1` and directly sets
+the nested on-chip RAM initialization parameter to `firmware/hello_uart.hex`.
+It ties unused logical
 inputs to safe constants and intentionally does not expose the simulation-only
 external CPU request/response interface, audio clock, I2S, or GPIO ports.
 
 ## RTL Changes
 
-### `rtl/top/soc_top.sv`
-
-Add a string parameter `RAM_INIT_FILE` with the empty string as its default.
-Pass that parameter to `onchip_ram.INIT_FILE`. Empty defaults preserve all
-current testbench behavior.
-
 ### `rtl/top/board_top.sv`
 
 Add a wrapper with ports `clk_50m`, `rst_n`, `uart_rx`, `uart_tx`, and
-`led[0]`. Instantiate `soc_top` with the internal CPU enabled and the hello
-firmware image selected. Map `phase1_ready` to `led[0]`.
+`led[0]`. Instantiate `soc_top` with the internal CPU enabled, use a `defparam`
+to select the hello firmware image for its on-chip RAM, and map `phase1_ready`
+to `led[0]`. This avoids Icarus Verilog 13.0's inability to forward a parent
+parameter into `onchip_ram`'s string parameter.
 
 ## Firmware Image
 

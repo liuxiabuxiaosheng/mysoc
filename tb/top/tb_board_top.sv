@@ -8,6 +8,7 @@ module tb_board_top;
     wire uart_tx;
     wire [0:0] led;
     logic [7:0] received [0:MESSAGE_LEN-1];
+    logic [7:0] expected [0:MESSAGE_LEN-1];
     integer i;
 
     board_top dut (
@@ -40,6 +41,12 @@ module tb_board_top;
     end
 
     initial begin
+        expected[0] = "H";  expected[1] = "e";  expected[2] = "l";
+        expected[3] = "l";  expected[4] = "o";  expected[5] = " ";
+        expected[6] = "R";  expected[7] = "I";  expected[8] = "S";
+        expected[9] = "C";  expected[10] = "-"; expected[11] = "V";
+        expected[12] = " "; expected[13] = "S"; expected[14] = "o";
+        expected[15] = "C"; expected[16] = 8'h0d; expected[17] = 8'h0a;
         repeat (3) @(posedge clk_50m);
         check(led[0] === 1'b0, "LED asserted while reset was active");
         rst_n = 1'b1;
@@ -47,11 +54,8 @@ module tb_board_top;
         check(led[0] === 1'b1, "LED did not assert after reset synchronization");
         for (i = 0; i < MESSAGE_LEN; i = i + 1)
             receive_byte(received[i]);
-        check({received[0], received[1], received[2], received[3], received[4],
-               received[5], received[6], received[7], received[8], received[9],
-               received[10], received[11], received[12], received[13], received[14],
-               received[15], received[16], received[17]} ==
-              "Hello RISC-V SoC\r\n", "UART hello message mismatch");
+        for (i = 0; i < MESSAGE_LEN; i = i + 1)
+            check(received[i] === expected[i], "UART hello message mismatch");
         check(!dut.u_soc.cpu_halted, "Internal CPU halted while transmitting hello");
         $display("PASS tb_board_top");
         $finish;
