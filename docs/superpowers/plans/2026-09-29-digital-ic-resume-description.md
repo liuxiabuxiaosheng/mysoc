@@ -42,12 +42,12 @@ RISC-V Audio DSP SoC RTL 设计与验证
 - [ ] **Step 3: 添加验证结果及精简替换版**
 
 ```text
-验证：基于 Icarus Verilog 完成 33 个 SystemVerilog Testbench 回归，全部 PASS；apb_subsystem 与 soc_top 静态 elaboration 通过。
+验证：基于 Icarus Verilog 完成 36 个 SystemVerilog Testbench 回归，全部 PASS；apb_subsystem 与 soc_top 静态 elaboration 通过。
 
 精简替换版：
 • 使用 SystemVerilog 完成含多周期 RV32IM、64 KiB BRAM、APB 外设和 DMA 的 SoC RTL 设计，支持 CSR/Trap、异常处理及 Timer/DMA/UART 中断。
 • 设计 Gray-pointer Async FIFO 和 16 阶 Q1.15 FIR，完成 50 MHz/12.5 MHz 双时钟域 BRAM-DMA-FIFO-FIR-DMA 音频链路，40 样本逐样本与黄金模型一致。
-• 搭建单元至 SoC 的 SystemVerilog 自检回归，覆盖协议时序、异常状态、FIFO 满空/回绕/独立复位及端到端数据搬运；33 个 Testbench 全部 PASS。
+• 搭建单元至 SoC 的 SystemVerilog 自检回归，覆盖协议时序、异常状态、FIFO 满空/回绕/独立复位及端到端数据搬运；36 个 Testbench 全部 PASS。
 ```
 
 - [ ] **Step 4: 确认简历边界**

@@ -16,7 +16,7 @@
 - 项目名称使用“RISC-V Audio DSP SoC RTL 设计与验证”。
 - 技术栈覆盖 SystemVerilog、RISC-V RV32IM、APB、DMA、BRAM、CDC/Async FIFO、定点 FIR、Icarus Verilog。
 - 成果覆盖 APB 外设与 UART、64 KiB BRAM 和 CPU 总线、多周期 RV32IM 与异常/中断、DMA 与仲裁、CDC 音频 FIR 端到端链路。
-- 验证证据使用“33 个 SystemVerilog Testbench 全部 PASS”及“顶层静态 elaboration 通过”。
+- 验证证据使用“36 个 SystemVerilog Testbench 全部 PASS”及“顶层静态 elaboration 通过”。
 - 明确避免声称完成 FPGA 上板、Vivado 综合/实现、STA、资源/功耗报告、物理音频 I/O、FFT、AI 推理或显示模块。
 
 ## 版式
