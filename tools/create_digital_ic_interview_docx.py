@@ -44,6 +44,13 @@ def set_style_font(style, size, color=BLACK, bold=False):
     style._element.rPr.rFonts.set(qn("w:eastAsia"), FONT)
 
 
+def remove_style_borders(style):
+    p_pr = style._element.get_or_add_pPr()
+    p_bdr = p_pr.find(qn("w:pBdr"))
+    if p_bdr is not None:
+        p_pr.remove(p_bdr)
+
+
 def set_spacing(paragraph, before=0, after=0, line=1.18):
     fmt = paragraph.paragraph_format
     fmt.space_before = Pt(before)
@@ -118,6 +125,7 @@ def configure_document(doc):
     styles["Normal"].paragraph_format.line_spacing = 1.18
 
     set_style_font(styles["Title"], 20, BLACK, True)
+    remove_style_borders(styles["Title"])
     styles["Title"].paragraph_format.space_after = Pt(9)
     styles["Title"].paragraph_format.line_spacing = 1.0
 
@@ -223,8 +231,6 @@ def add_contents(doc):
 def add_heading(doc, level, text):
     paragraph = doc.add_paragraph(clean_inline(text), style=f"Heading {level}")
     paragraph.paragraph_format.keep_with_next = True
-    if level == 1:
-        paragraph.paragraph_format.page_break_before = True
     if level == 2 and text.startswith("Q"):
         set_shading(paragraph, LIGHT_BLUE)
         paragraph.paragraph_format.left_indent = Inches(0.04)

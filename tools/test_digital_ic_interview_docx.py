@@ -24,6 +24,10 @@ def main():
     footer_xml = "".join(
         section.footer._element.xml for section in doc.sections
     )
+    round_headings = [
+        p for p in paragraphs
+        if p.style.name == "Heading 1" and p.text.startswith("第")
+    ]
 
     assert doc.core_properties.title == "数字 IC 校招项目面试模拟与参考回答"
     assert len(question_headings) == 24, len(question_headings)
@@ -34,6 +38,8 @@ def main():
     assert "36 个 SystemVerilog Testbench" in text
     assert "项目边界与高风险表述" in text
     assert "w:instrText" in footer_xml and "PAGE" in footer_xml
+    assert "w:pBdr" not in doc.styles["Title"]._element.xml
+    assert not any(p.paragraph_format.page_break_before for p in round_headings)
     print("digital IC interview DOCX validation PASS")
 
 
